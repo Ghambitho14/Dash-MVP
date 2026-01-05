@@ -1,0 +1,84 @@
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 50;
+	padding: 1rem;
+	animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.modal-content {
+	background-color: white;
+	border-radius: 1.5rem;
+	width: 100%;
+	max-height: 90vh;
+	overflow-y: auto;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+	animation: slideUp 0.3s ease;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideUp {
+	from {
+		transform: translateY(20px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+.modal-content-sm {
+	max-width: 24rem;
+}
+
+.modal-content-md {
+	max-width: 28rem;
+}
+
+.modal-content-lg {
+	max-width: 32rem;
+}
+
+.modal-content-xl {
+	max-width: 36rem;
+}
+
+.modal-content-2xl {
+	max-width: 42rem;
+}
+
+.modal-content-3xl {
+	max-width: 48rem;
+}
+
+@media (max-width: 640px) {
+	.modal-overlay {
+		padding: 1rem;
+		align-items: center;
+	}
+
+	.modal-content {
+		border-radius: 1.5rem;
+		max-height: 90vh;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+	}
+}
+

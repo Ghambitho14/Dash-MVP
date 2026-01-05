@@ -1,0 +1,296 @@
+/* ====================================
+   CONFIGURACIÓN DE LOCALES
+   ==================================== */
+
+.configuracion-locales {
+	padding: 2rem;
+}
+
+/* Header */
+.configuracion-locales-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 2rem;
+}
+
+.configuracion-locales-header-content h3 {
+	color: var(--app-gray-800);
+	margin: 0 0 0.25rem 0;
+	font-size: 1.5rem;
+	font-weight: 700;
+}
+
+.configuracion-locales-header-content p {
+	color: var(--app-gray-600);
+	margin: 0;
+	font-size: 0.875rem;
+}
+
+.configuracion-locales-close {
+	width: 2.5rem;
+	height: 2.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 0.5rem;
+	border: none;
+	background: var(--app-gray-100);
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	color: var(--app-gray-600);
+}
+
+.configuracion-locales-close:hover {
+	background: var(--app-gray-200);
+	color: var(--app-gray-800);
+}
+
+.configuracion-locales-close svg {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+/* Lista de Locales */
+.configuracion-locales-list {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+	max-height: 60vh;
+	overflow-y: auto;
+	padding-right: 0.5rem;
+}
+
+.configuracion-locales-list::-webkit-scrollbar {
+	width: 0.5rem;
+}
+
+.configuracion-locales-list::-webkit-scrollbar-track {
+	background: var(--app-gray-100);
+	border-radius: 0.25rem;
+}
+
+.configuracion-locales-list::-webkit-scrollbar-thumb {
+	background: var(--app-gray-300);
+	border-radius: 0.25rem;
+}
+
+.configuracion-locales-list::-webkit-scrollbar-thumb:hover {
+	background: var(--app-gray-400);
+}
+
+/* Item de Local */
+.configuracion-locales-item {
+	background: white;
+	padding: 1.25rem;
+	border-radius: 0.75rem;
+	border: 1px solid var(--app-gray-200);
+	transition: all var(--app-transition-base);
+}
+
+.configuracion-locales-item:hover {
+	box-shadow: var(--app-shadow);
+	border-color: var(--app-gray-300);
+	transform: translateY(-2px);
+}
+
+.configuracion-locales-item-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 1rem;
+}
+
+.configuracion-locales-item-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.configuracion-locales-item-title svg {
+	width: 1.25rem;
+	height: 1.25rem;
+	color: var(--app-blue-primary);
+}
+
+.configuracion-locales-item-title-text {
+	color: var(--app-gray-800);
+	font-weight: 600;
+	font-size: 0.875rem;
+	margin: 0;
+}
+
+.configuracion-locales-item-delete {
+	padding: 0.375rem;
+	color: var(--app-gray-500);
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	border-radius: 0.375rem;
+	transition: all var(--app-transition-base);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.configuracion-locales-item-delete:hover {
+	background: rgba(239, 68, 68, 0.1);
+	color: var(--app-red);
+}
+
+.configuracion-locales-item-delete svg {
+	width: 1rem;
+	height: 1rem;
+}
+
+/* Campos del Item */
+.configuracion-locales-item-fields {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.configuracion-locales-item-field {
+	display: flex;
+	flex-direction: column;
+}
+
+.configuracion-locales-item-label {
+	display: block;
+	color: var(--app-gray-700);
+	margin-bottom: 0.5rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+.configuracion-locales-item-label-content {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.configuracion-locales-item-label-content svg {
+	width: 0.875rem;
+	height: 0.875rem;
+	color: var(--app-gray-500);
+}
+
+.configuracion-locales-item-input {
+	padding: 0.625rem 0.875rem;
+	border: 1px solid var(--app-gray-300);
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	color: var(--app-gray-800);
+	background: white;
+	transition: all var(--app-transition-base);
+}
+
+.configuracion-locales-item-input:focus {
+	outline: none;
+	border-color: var(--app-blue-primary);
+	box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.configuracion-locales-item-input::placeholder {
+	color: var(--app-gray-400);
+}
+
+/* Botón Agregar */
+.configuracion-locales-add {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.875rem 1rem;
+	border: 2px dashed var(--app-gray-300);
+	border-radius: 0.75rem;
+	background: var(--app-gray-50);
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	color: var(--app-gray-600);
+	font-size: 0.875rem;
+	font-weight: 500;
+	margin-bottom: 1.5rem;
+}
+
+.configuracion-locales-add:hover {
+	border-color: var(--app-blue-primary);
+	background: rgba(37, 99, 235, 0.05);
+	color: var(--app-blue-primary);
+}
+
+.configuracion-locales-add svg {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+/* Acciones */
+.configuracion-locales-actions {
+	display: flex;
+	gap: 0.75rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid var(--app-gray-200);
+}
+
+.configuracion-locales-button {
+	flex: 1;
+	padding: 0.75rem 1.5rem;
+	border-radius: 0.5rem;
+	border: none;
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+.configuracion-locales-button-cancel {
+	border: 1px solid var(--app-gray-300);
+	color: var(--app-gray-700);
+	background: white;
+}
+
+.configuracion-locales-button-cancel:hover {
+	background: var(--app-gray-50);
+	border-color: var(--app-gray-400);
+}
+
+.configuracion-locales-button-save {
+	background: var(--app-blue-primary);
+	color: white;
+	box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.configuracion-locales-button-save:hover {
+	background: var(--app-blue-dark);
+	transform: translateY(-2px);
+	box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+	.configuracion-locales {
+		padding: 1.5rem;
+	}
+
+	.configuracion-locales-header {
+		margin-bottom: 1.5rem;
+	}
+
+	.configuracion-locales-header-content h3 {
+		font-size: 1.25rem;
+	}
+
+	.configuracion-locales-item {
+		padding: 1rem;
+	}
+
+	.configuracion-locales-actions {
+		flex-direction: column;
+	}
+
+	.configuracion-locales-button {
+		width: 100%;
+	}
+}

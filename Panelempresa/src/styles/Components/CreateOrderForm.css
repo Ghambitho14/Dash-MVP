@@ -1,0 +1,460 @@
+/* ====================================
+   FORMULARIO CREAR PEDIDO - DISEÑO MODERNO
+   ==================================== */
+
+.formulario-crear-pedido-container {
+	background-color: white;
+	border-radius: 1rem;
+	width: 100%;
+	max-height: 90vh;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.formulario-crear-pedido-container::-webkit-scrollbar {
+	width: 0.5rem;
+}
+
+.formulario-crear-pedido-container::-webkit-scrollbar-track {
+	background: var(--app-gray-100);
+	border-radius: 0.25rem;
+}
+
+.formulario-crear-pedido-container::-webkit-scrollbar-thumb {
+	background: var(--app-gray-300);
+	border-radius: 0.25rem;
+}
+
+.formulario-crear-pedido-container::-webkit-scrollbar-thumb:hover {
+	background: var(--app-gray-400);
+}
+
+/* Header */
+.formulario-crear-pedido-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	padding: 2rem;
+	padding-bottom: 1rem;
+	border-bottom: 1px solid var(--app-gray-200);
+	flex-shrink: 0;
+}
+
+.formulario-crear-pedido-header-left {
+	display: flex;
+	align-items: flex-start;
+	gap: 1rem;
+	flex: 1;
+}
+
+.formulario-crear-pedido-header-icon {
+	width: 3rem;
+	height: 3rem;
+	background: var(--app-blue-primary);
+	border-radius: 0.75rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+	flex-shrink: 0;
+	color: white;
+}
+
+.formulario-crear-pedido-header-icon svg {
+	width: 1.5rem;
+	height: 1.5rem;
+}
+
+.formulario-crear-pedido-title {
+	margin: 0;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--app-gray-800);
+}
+
+.formulario-crear-pedido-subtitle {
+	margin: 0.25rem 0 0;
+	font-size: 0.875rem;
+	color: var(--app-gray-600);
+}
+
+.formulario-crear-pedido-close {
+	width: 2.5rem;
+	height: 2.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 0.5rem;
+	border: none;
+	background: none;
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	color: var(--app-gray-600);
+	flex-shrink: 0;
+}
+
+.formulario-crear-pedido-close:hover {
+	background-color: var(--app-gray-100);
+	color: var(--app-gray-800);
+}
+
+.formulario-crear-pedido-close svg {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+/* Form */
+.formulario-crear-pedido {
+	padding: 2rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	flex: 1;
+	overflow-y: auto;
+}
+
+.formulario-crear-pedido-group {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.formulario-crear-pedido-label {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--app-gray-700);
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.formulario-crear-pedido-input-wrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.formulario-crear-pedido-input-icon {
+	position: absolute;
+	left: 1rem;
+	top: 50%;
+	transform: translateY(-50%);
+	color: var(--app-gray-400);
+	width: 1.25rem;
+	height: 1.25rem;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.formulario-crear-pedido-textarea-icon {
+	top: 1rem;
+	transform: none;
+}
+
+.formulario-crear-pedido-input {
+	width: 100%;
+	padding: 0.875rem 1rem 0.875rem 3rem;
+	border: 2px solid var(--app-gray-200);
+	border-radius: 0.75rem;
+	font-size: 1rem;
+	transition: all var(--app-transition-base);
+	background-color: var(--app-gray-50);
+	color: var(--app-gray-800);
+	font-family: inherit;
+}
+
+.formulario-crear-pedido-input:focus {
+	outline: none;
+	border-color: var(--app-blue-primary);
+	background: white;
+	box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.formulario-crear-pedido-input::placeholder {
+	color: var(--app-gray-400);
+}
+
+.formulario-crear-pedido-textarea {
+	width: 100%;
+	padding: 0.875rem 1rem 0.875rem 3rem;
+	border: 2px solid var(--app-gray-200);
+	border-radius: 0.75rem;
+	font-size: 1rem;
+	resize: vertical;
+	min-height: 5rem;
+	transition: all var(--app-transition-base);
+	background-color: var(--app-gray-50);
+	color: var(--app-gray-800);
+	font-family: inherit;
+}
+
+.formulario-crear-pedido-textarea:focus {
+	outline: none;
+	border-color: var(--app-blue-primary);
+	background: white;
+	box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.formulario-crear-pedido-textarea::placeholder {
+	color: var(--app-gray-400);
+}
+
+/* Client Dropdown */
+.formulario-crear-pedido-client-wrapper {
+	position: relative;
+	width: 100%;
+}
+
+.formulario-crear-pedido-client-dropdown {
+	position: absolute;
+	top: calc(100% + 0.5rem);
+	left: 0;
+	right: 0;
+	background-color: white;
+	border: 2px solid var(--app-gray-200);
+	border-radius: 0.75rem;
+	box-shadow: var(--app-shadow-xl);
+	max-height: 16rem;
+	overflow-y: auto;
+	z-index: 10;
+}
+
+.formulario-crear-pedido-client-item {
+	width: 100%;
+	padding: 1rem;
+	border: none;
+	background: none;
+	cursor: pointer;
+	text-align: left;
+	transition: background-color var(--app-transition-base);
+	border-bottom: 1px solid var(--app-gray-100);
+}
+
+.formulario-crear-pedido-client-item:last-child {
+	border-bottom: none;
+}
+
+.formulario-crear-pedido-client-item:hover {
+	background-color: var(--app-gray-50);
+}
+
+.formulario-crear-pedido-client-item-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.formulario-crear-pedido-client-item-name {
+	margin: 0;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--app-gray-800);
+}
+
+.formulario-crear-pedido-client-item-details {
+	margin: 0;
+	font-size: 0.75rem;
+	color: var(--app-gray-600);
+}
+
+.formulario-crear-pedido-client-badge {
+	padding: 0.25rem 0.625rem;
+	background-color: rgba(37, 99, 235, 0.1);
+	color: var(--app-blue-primary);
+	border-radius: 0.375rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+/* Local Display */
+.formulario-crear-pedido-local-display {
+	padding: 0.875rem 1rem 0.875rem 3rem;
+	background-color: rgba(37, 99, 235, 0.1);
+	border: 2px solid var(--app-blue-primary);
+	border-radius: 0.75rem;
+	color: var(--app-blue-primary);
+	font-weight: 600;
+	font-size: 1rem;
+}
+
+/* Local Grid */
+.formulario-crear-pedido-local-grid {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.formulario-crear-pedido-local-grid-3 {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.formulario-crear-pedido-local-grid-4 {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.formulario-crear-pedido-local-grid-5 {
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.formulario-crear-pedido-local-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.875rem 1rem;
+	border-radius: 0.75rem;
+	border: 2px solid;
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	font-size: 0.875rem;
+	font-weight: 600;
+	font-family: inherit;
+}
+
+.formulario-crear-pedido-local-button-active {
+	background-color: var(--app-blue-primary);
+	color: white;
+	border-color: var(--app-blue-primary);
+	box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.formulario-crear-pedido-local-button-inactive {
+	background-color: white;
+	color: var(--app-gray-700);
+	border-color: var(--app-gray-200);
+}
+
+.formulario-crear-pedido-local-button-inactive:hover {
+	border-color: var(--app-blue-primary);
+	background-color: var(--app-gray-50);
+}
+
+.formulario-crear-pedido-local-button svg {
+	width: 1rem;
+	height: 1rem;
+}
+
+/* Actions */
+.formulario-crear-pedido-actions {
+	display: flex;
+	gap: 0.75rem;
+	margin-top: 0.5rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid var(--app-gray-200);
+}
+
+.formulario-crear-pedido-button {
+	flex: 1;
+	padding: 0.875rem 1.5rem;
+	border-radius: 0.75rem;
+	border: none;
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	font-size: 1rem;
+	font-weight: 600;
+	font-family: inherit;
+}
+
+.formulario-crear-pedido-button-cancel {
+	border: 2px solid var(--app-gray-200);
+	color: var(--app-gray-700);
+	background-color: white;
+}
+
+.formulario-crear-pedido-button-cancel:hover {
+	background-color: var(--app-gray-50);
+	border-color: var(--app-gray-300);
+}
+
+.formulario-crear-pedido-button-submit {
+	background: var(--app-blue-primary);
+	color: white;
+	box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.formulario-crear-pedido-button-submit:hover:not(:disabled) {
+	background: var(--app-blue-dark);
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.formulario-crear-pedido-button-submit:active:not(:disabled) {
+	transform: translateY(0);
+}
+
+.formulario-crear-pedido-button-submit:disabled {
+	background-color: var(--app-gray-300);
+	cursor: not-allowed;
+	opacity: 0.6;
+	box-shadow: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.formulario-crear-pedido-header {
+		padding: 1.5rem;
+		padding-bottom: 1rem;
+	}
+
+	.formulario-crear-pedido-header-icon {
+		width: 2.5rem;
+		height: 2.5rem;
+	}
+
+	.formulario-crear-pedido-header-icon svg {
+		width: 1.25rem;
+		height: 1.25rem;
+	}
+
+	.formulario-crear-pedido-title {
+		font-size: 1.25rem;
+	}
+
+	.formulario-crear-pedido-subtitle {
+		font-size: 0.8125rem;
+	}
+
+	.formulario-crear-pedido {
+		padding: 1.5rem;
+		gap: 1.25rem;
+	}
+
+	.formulario-crear-pedido-input,
+	.formulario-crear-pedido-textarea {
+		padding: 0.75rem 0.875rem 0.75rem 2.75rem;
+		font-size: 0.9375rem;
+	}
+
+	.formulario-crear-pedido-input-icon {
+		width: 1.125rem;
+		height: 1.125rem;
+		left: 0.875rem;
+	}
+
+	.formulario-crear-pedido-local-grid-3,
+	.formulario-crear-pedido-local-grid-4,
+	.formulario-crear-pedido-local-grid-5 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.formulario-crear-pedido-local-button {
+		font-size: 0.8125rem;
+		padding: 0.75rem 0.875rem;
+	}
+
+	.formulario-crear-pedido-actions {
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.formulario-crear-pedido-button {
+		width: 100%;
+	}
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+	.formulario-crear-pedido-local-grid-4,
+	.formulario-crear-pedido-local-grid-5 {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}

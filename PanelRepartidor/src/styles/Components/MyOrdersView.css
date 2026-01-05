@@ -1,0 +1,406 @@
+/* =========================
+   MY ORDERS VIEW
+========================= */
+
+.my-orders-view-container {
+	padding: 2rem 1.5rem;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.my-orders-view-header {
+	margin-bottom: 2rem;
+}
+
+.my-orders-view-title {
+	font-size: 1.75rem;
+	font-weight: 700;
+	margin: 0 0 0.5rem 0;
+	color: #0f172a;
+}
+
+.my-orders-view-subtitle {
+	font-size: 0.95rem;
+	margin: 0;
+	color: #64748b;
+}
+
+.my-orders-view-active-order-card {
+	border-radius: 1.75rem;
+	padding: 1.75rem;
+	border: 2px solid #e0f2fe;
+	margin-bottom: 1.5rem;
+	box-shadow: 0 4px 20px rgba(43, 115, 238, 0.15);
+	background: white;
+}
+
+.my-orders-view-timer-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	padding: 1.25rem;
+	background: linear-gradient(135deg, rgba(43, 115, 238, 0.1) 0%, rgba(82, 138, 244, 0.1) 100%);
+	border-radius: 1.25rem;
+	margin-bottom: 1.5rem;
+}
+
+.my-orders-view-timer-icon {
+	width: 1.5rem;
+	height: 1.5rem;
+	color: #2b73ee;
+}
+
+.my-orders-view-timer-text {
+	font-size: 0.938rem;
+	font-weight: 500;
+	color: #64748b;
+}
+
+.my-orders-view-timer-value {
+	font-size: 1.5rem;
+	font-weight: 800;
+	font-family: monospace;
+	color: #10b981;
+}
+
+.my-orders-view-timer-value-warning {
+	color: #ef4444;
+}
+
+.my-orders-view-active-order-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-bottom: 1.75rem;
+}
+
+.my-orders-view-active-order-badge {
+	display: inline-block;
+	padding: 0.5rem 1rem;
+	background: linear-gradient(135deg, #2b73ee 0%, #528af4 100%);
+	color: white;
+	border-radius: 2rem;
+	font-size: 0.813rem;
+	font-weight: 600;
+	margin-bottom: 0.875rem;
+}
+
+.my-orders-view-active-order-title {
+	font-size: 1.5rem;
+	font-weight: 700;
+	margin: 0;
+	color: #0f172a;
+}
+
+.my-orders-view-active-order-payment {
+	font-size: 1.75rem;
+	font-weight: 700;
+	color: #10b981;
+}
+
+.my-orders-view-active-order-progress {
+	display: flex;
+	align-items: center;
+	margin-bottom: 2rem;
+	padding: 1.5rem;
+	background: #f8fafc;
+	border-radius: 1.125rem;
+}
+
+.my-orders-view-progress-step {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.625rem;
+}
+
+.my-orders-view-progress-dot {
+	width: 1.125rem;
+	height: 1.125rem;
+	border-radius: 50%;
+	background: #e5e7eb;
+}
+
+.my-orders-view-progress-dot-complete {
+	background: #10b981;
+	box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.my-orders-view-progress-dot-active {
+	background: #2b73ee;
+	animation: my-orders-view-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes my-orders-view-pulse {
+	0%, 100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.6;
+		transform: scale(0.85);
+	}
+}
+
+.my-orders-view-progress-line {
+	flex: 1;
+	height: 2px;
+	margin: 0 0.75rem;
+	margin-bottom: 1.875rem;
+	background: #e5e7eb;
+}
+
+.my-orders-view-progress-label {
+	font-size: 0.813rem;
+	font-weight: 500;
+	white-space: nowrap;
+	color: #64748b;
+}
+
+.my-orders-view-section-title {
+	font-size: 0.875rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-bottom: 1rem;
+	color: #64748b;
+}
+
+.my-orders-view-active-order-details {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.my-orders-view-order-detail {
+	display: flex;
+	align-items: center;
+	gap: 0.875rem;
+	font-size: 0.938rem;
+	color: #475569;
+}
+
+.my-orders-view-order-icon {
+	width: 1.25rem;
+	height: 1.25rem;
+	flex-shrink: 0;
+	color: #94a3b8;
+}
+
+.my-orders-view-location-wrapper {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	justify-content: space-between;
+}
+
+.my-orders-view-map-button {
+	padding: 0.625rem;
+	background: rgba(43, 115, 238, 0.1);
+	border: none;
+	border-radius: 0.75rem;
+	cursor: pointer;
+	transition: all 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.my-orders-view-map-button:hover {
+	background: rgba(43, 115, 238, 0.2);
+}
+
+.my-orders-view-map-icon {
+	width: 1.25rem;
+	height: 1.25rem;
+	color: #2b73ee;
+}
+
+.my-orders-view-active-order-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	margin-bottom: 1.25rem;
+}
+
+.my-orders-view-active-order-actions > button {
+	flex: 1;
+	min-width: 120px;
+}
+
+.my-orders-view-navigation-button {
+	padding: 1rem;
+	background: linear-gradient(135deg, #035ce8 0%, #2b73ee 100%);
+	color: white;
+	border: none;
+	border-radius: 1.125rem;
+	font-size: 0.938rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.625rem;
+}
+
+.my-orders-view-navigation-button:hover {
+	background: linear-gradient(135deg, #2b73ee 0%, #528af4 100%);
+	box-shadow: 0 4px 15px rgba(43, 115, 238, 0.4);
+}
+
+.my-orders-view-call-button {
+	padding: 1rem;
+	background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+	color: white;
+	border: none;
+	border-radius: 1.125rem;
+	font-size: 0.938rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.625rem;
+}
+
+.my-orders-view-call-button:hover {
+	background: linear-gradient(135deg, #059669 0%, #047857 100%);
+	box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.my-orders-view-chat-button {
+	padding: 1rem;
+	background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+	color: white;
+	border: none;
+	border-radius: 1.125rem;
+	font-size: 0.938rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.625rem;
+}
+
+.my-orders-view-chat-button:hover {
+	background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+	box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+
+.my-orders-view-en-camino-button {
+	width: 100%;
+	padding: 1.25rem;
+	background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+	color: white;
+	border: none;
+	border-radius: 1.25rem;
+	font-size: 1.063rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s;
+	box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+}
+
+.my-orders-view-en-camino-button:hover {
+	background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+	box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+.my-orders-view-retire-button {
+	width: 100%;
+	padding: 1.25rem;
+	background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+	color: white;
+	border: none;
+	border-radius: 1.25rem;
+	font-size: 1.063rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s;
+	box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+}
+
+.my-orders-view-retire-button:hover {
+	background: linear-gradient(135deg, #059669 0%, #047857 100%);
+	box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.my-orders-view-complete-button {
+	width: 100%;
+	padding: 1.25rem;
+	background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+	color: white;
+	border: none;
+	border-radius: 1.25rem;
+	font-size: 1.063rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s;
+	box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.my-orders-view-complete-button:hover {
+	background: linear-gradient(135deg, #059669 0%, #047857 100%);
+	box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.my-orders-view-info-card {
+	padding: 1.25rem;
+	border-radius: 1.125rem;
+	border: 1px solid rgba(43, 115, 238, 0.1);
+	background: linear-gradient(135deg, rgba(43, 115, 238, 0.05) 0%, rgba(82, 138, 244, 0.05) 100%);
+}
+
+.my-orders-view-info-text {
+	font-size: 0.875rem;
+	margin: 0;
+	line-height: 1.6;
+	color: #475569;
+}
+
+.my-orders-view-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem 1.5rem;
+	text-align: center;
+}
+
+.my-orders-view-empty-icon {
+	width: 4rem;
+	height: 4rem;
+	color: #cbd5e1;
+	margin-bottom: 1rem;
+}
+
+.my-orders-view-empty-title {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #0f172a;
+	margin: 0 0 0.5rem 0;
+}
+
+.my-orders-view-empty-text {
+	font-size: 0.938rem;
+	color: #64748b;
+	margin: 0;
+	line-height: 1.6;
+}
+

@@ -1,0 +1,85 @@
+.superposicion-modal {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(8px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	padding: 1rem;
+	animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.contenido-modal {
+	background-color: white;
+	border-radius: 1.5rem;
+	width: 100%;
+	max-height: 90vh;
+	overflow-y: auto;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+	animation: slideUp 0.3s ease;
+	border: 1px solid var(--app-border-light);
+	backdrop-filter: blur(8px);
+}
+
+@keyframes slideUp {
+	from {
+		transform: translateY(20px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+.contenido-modal-pequeño {
+	max-width: 24rem;
+}
+
+.contenido-modal-mediano {
+	max-width: 28rem;
+}
+
+.contenido-modal-grande {
+	max-width: 32rem;
+}
+
+.contenido-modal-extra-grande {
+	max-width: 36rem;
+}
+
+.contenido-modal-2xl {
+	max-width: 42rem;
+}
+
+.contenido-modal-3xl {
+	max-width: 48rem;
+}
+
+@media (max-width: 640px) {
+	.superposicion-modal {
+		padding: 0;
+		align-items: flex-end;
+	}
+
+	.contenido-modal {
+		border-radius: 1rem 1rem 0 0;
+		max-height: 95vh;
+		border-bottom: none;
+	}
+}
+

@@ -1,0 +1,51 @@
+# IDEs y Editores
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Carpetas de dependencias
+Panelempresa/node_modules/
+Paneladmin/node_modules/
+PanelRepartidor/node_modules/
+
+Panelempresa/dist/
+Paneladmin/dist/
+PanelRepartidor/dist/
+
+Panelempresa/build/
+Paneladmin/build/
+PanelRepartidor/build/
+
+PanelRepartidor/android/
+
+servidor/
+AGENTS.MD
+build-panels.bat
+
+
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Variables de entorno
+.env
+.env.local
+.env*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Archivos temporales
+*.tmp
+*.temp
+.cache/
+
+

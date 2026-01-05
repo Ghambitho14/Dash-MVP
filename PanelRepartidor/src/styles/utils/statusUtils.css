@@ -1,0 +1,35 @@
+.status-pendiente {
+	background-color: #fefce8;
+	color: #713f12;
+}
+
+.status-asignado {
+	background-color: #dbeafe;
+	color: #1e3a8a;
+}
+
+.status-en-camino-al-retiro {
+	background-color: #f3e8ff;
+	color: #6b21a8;
+}
+
+.status-producto-retirado {
+	background-color: #e0e7ff;
+	color: #4338ca;
+}
+
+.status-en-entrega {
+	background-color: #ffedd5;
+	color: #7c2d12;
+}
+
+.status-entregado {
+	background-color: #dcfce7;
+	color: #14532d;
+}
+
+.status-default {
+	background-color: #f3f4f6;
+	color: #374151;
+}
+

@@ -1,0 +1,529 @@
+.tracking-panel {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.tracking-panel-map {
+	width: 100%;
+	height: 100%;
+	min-height: 500px;
+	border-radius: 0.5rem;
+	overflow: hidden;
+}
+
+.tracking-panel-loading,
+.tracking-panel-error,
+.tracking-panel-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	padding: 3rem;
+	text-align: center;
+	color: #6b7280;
+	height: 100%;
+	min-height: 500px;
+}
+
+.tracking-panel-loading svg,
+.tracking-panel-error svg,
+.tracking-panel-empty svg {
+	width: 3rem;
+	height: 3rem;
+	color: #9ca3af;
+	animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.tracking-panel-error {
+	color: #ef4444;
+}
+
+.tracking-panel-error svg {
+	color: #ef4444;
+}
+
+.tracking-panel-error h3 {
+	margin: 0;
+	font-size: 1.125rem;
+	font-weight: 600;
+}
+
+.tracking-panel-error h3 code {
+	background: rgba(0, 0, 0, 0.1);
+	padding: 0.125rem 0.25rem;
+	border-radius: 0.25rem;
+	font-family: monospace;
+	font-size: 0.875em;
+}
+
+.tracking-panel-error p {
+	margin: 0.5rem 0 0 0;
+	font-size: 0.875rem;
+}
+
+.tracking-panel-error a {
+	color: #2563eb;
+	text-decoration: underline;
+}
+
+.tracking-panel-error a:hover {
+	color: #1d4ed8;
+}
+
+.tracking-panel-error-steps {
+	margin-top: 1.5rem;
+	padding: 1rem;
+	background: rgba(239, 68, 68, 0.1);
+	border-radius: 0.5rem;
+	border-left: 3px solid #ef4444;
+	text-align: left;
+	max-width: 600px;
+}
+
+.tracking-panel-error-steps p {
+	margin: 0 0 0.75rem 0;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #dc2626;
+}
+
+.tracking-panel-error-steps ol {
+	margin: 0;
+	padding-left: 1.5rem;
+	color: #374151;
+}
+
+.tracking-panel-error-steps li {
+	margin: 0.5rem 0;
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
+
+.tracking-panel-error-steps a {
+	color: #2563eb;
+	text-decoration: underline;
+}
+
+.tracking-panel-error-steps a:hover {
+	color: #1d4ed8;
+}
+
+.tracking-panel-empty p {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 500;
+}
+
+.tracking-panel-empty-overlay {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	padding: 2rem;
+	background: rgba(255, 255, 255, 0.95);
+	border-radius: 0.5rem;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+	text-align: center;
+	color: #6b7280;
+	z-index: 10;
+	pointer-events: none;
+}
+
+.tracking-panel-empty-overlay svg {
+	width: 2.5rem;
+	height: 2.5rem;
+	color: #9ca3af;
+}
+
+.tracking-panel-empty-overlay p {
+	margin: 0;
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+@keyframes pulse {
+	0%, 100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+
+/* ============================================
+   HEADER Y CONTENIDO
+   ============================================ */
+
+.tracking-panel-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1rem;
+	background: #ffffff;
+	border-bottom: 1px solid #e5e7eb;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.tracking-panel-legend {
+	display: flex;
+	gap: 1.5rem;
+	flex-wrap: wrap;
+}
+
+.tracking-legend-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.875rem;
+	color: #6b7280;
+}
+
+.tracking-legend-marker {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	border: 2px solid #ffffff;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.tracking-legend-pickup {
+	background: #3b82f6;
+}
+
+.tracking-legend-delivery {
+	background: #10b981;
+}
+
+.tracking-legend-driver {
+	background: #f59e0b;
+}
+
+.tracking-panel-stats {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.875rem;
+	color: #6b7280;
+}
+
+.tracking-panel-drivers-count {
+	color: #3b82f6;
+	font-weight: 500;
+}
+
+.tracking-panel-content {
+	position: relative;
+	width: 100%;
+	height: calc(100% - 80px);
+	display: flex;
+}
+
+/* ============================================
+   SIDEBAR DE REPARTIDORES
+   ============================================ */
+
+.tracking-sidebar {
+	width: 320px;
+	background: #ffffff;
+	border-right: 1px solid #e5e7eb;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
+	z-index: 10;
+}
+
+.tracking-sidebar-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	padding: 1rem;
+	border-bottom: 1px solid #e5e7eb;
+	background: #f9fafb;
+}
+
+.tracking-sidebar-header-content {
+	flex: 1;
+}
+
+.tracking-sidebar-header h3 {
+	margin: 0 0 0.25rem 0;
+	font-size: 1rem;
+	font-weight: 600;
+	color: #111827;
+}
+
+.tracking-sidebar-header-subtitle {
+	margin: 0;
+	font-size: 0.75rem;
+	color: #6b7280;
+}
+
+.tracking-sidebar-close {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0.25rem;
+	color: #6b7280;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 0.25rem;
+	transition: background-color 0.2s;
+}
+
+.tracking-sidebar-close:hover {
+	background: #e5e7eb;
+	color: #111827;
+}
+
+.tracking-sidebar-content {
+	flex: 1;
+	overflow-y: auto;
+	padding: 0.5rem;
+}
+
+.tracking-sidebar-toggle {
+	position: absolute;
+	top: 1rem;
+	left: 1rem;
+	z-index: 20;
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 0.5rem;
+	padding: 0.75rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	transition: all 0.2s;
+}
+
+.tracking-sidebar-toggle:hover {
+	background: #f9fafb;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tracking-sidebar-toggle svg {
+	color: #3b82f6;
+}
+
+.tracking-sidebar-toggle span {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #111827;
+}
+
+/* ============================================
+   TARJETAS DE REPARTIDORES
+   ============================================ */
+
+.tracking-driver-card {
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 0.5rem;
+	padding: 1rem;
+	margin-bottom: 0.75rem;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.tracking-driver-card:hover {
+	border-color: #3b82f6;
+	box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+}
+
+.tracking-driver-card.selected {
+	border-color: #3b82f6;
+	background: #eff6ff;
+	box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.tracking-driver-header {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 0.75rem;
+}
+
+.tracking-driver-icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background: #eff6ff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #3b82f6;
+	flex-shrink: 0;
+}
+
+.tracking-driver-info {
+	flex: 1;
+	min-width: 0;
+}
+
+.tracking-driver-name {
+	margin: 0 0 0.25rem 0;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #111827;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.tracking-driver-orders {
+	margin: 0;
+	font-size: 0.75rem;
+	color: #6b7280;
+}
+
+.tracking-driver-status {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+
+.tracking-driver-status-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #10b981;
+	animation: pulse 2s infinite;
+}
+
+.tracking-driver-orders-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	margin-bottom: 0.75rem;
+	padding-top: 0.75rem;
+	border-top: 1px solid #e5e7eb;
+}
+
+.tracking-driver-order-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.5rem;
+	background: #f9fafb;
+	border-radius: 0.25rem;
+	font-size: 0.75rem;
+	border: 1px solid transparent;
+	transition: all 0.2s;
+	cursor: pointer;
+}
+
+.tracking-driver-order-item:hover {
+	background: #f3f4f6;
+}
+
+.tracking-driver-order-item.selected {
+	background: #dbeafe;
+	border-color: #3b82f6;
+}
+
+.tracking-driver-order-item.selected .tracking-driver-order-id {
+	color: #3b82f6;
+	font-weight: 600;
+}
+
+.tracking-driver-order-id {
+	font-weight: 600;
+	color: #111827;
+}
+
+.tracking-driver-order-status {
+	color: #6b7280;
+	font-size: 0.7rem;
+	text-transform: capitalize;
+}
+
+.tracking-driver-location {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding-top: 0.75rem;
+	border-top: 1px solid #e5e7eb;
+	font-size: 0.75rem;
+	color: #6b7280;
+}
+
+.tracking-driver-location svg {
+	color: #3b82f6;
+	flex-shrink: 0;
+}
+
+.tracking-driver-location-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.125rem;
+	flex: 1;
+	min-width: 0;
+}
+
+.tracking-driver-location-status {
+	font-weight: 500;
+	color: #111827;
+}
+
+.tracking-driver-location-coords {
+	font-size: 0.7rem;
+	color: #9ca3af;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* ============================================
+   MAPA CON SIDEBAR
+   ============================================ */
+
+.tracking-panel-map.with-sidebar {
+	width: calc(100% - 320px);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+	.tracking-sidebar {
+		width: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 100%;
+		z-index: 30;
+		box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.tracking-panel-map.with-sidebar {
+		width: 100%;
+	}
+
+	.tracking-panel-header {
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 0.75rem;
+	}
+
+	.tracking-panel-legend {
+		gap: 1rem;
+	}
+
+	.tracking-panel-content {
+		height: calc(100% - 120px);
+	}
+}
+

@@ -1,0 +1,423 @@
+/* =========================
+   DRIVER REGISTRATION FORM
+========================= */
+
+.driver-registration-container {
+	background: white;
+	border-radius: 1.5rem;
+	padding: 2rem;
+	max-width: 100%;
+	width: 100%;
+	max-height: 90vh;
+	overflow-y: auto;
+}
+
+.driver-registration-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 2rem;
+	padding-bottom: 1rem;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+.driver-registration-header-content {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.driver-registration-icon {
+	width: 1.5rem;
+	height: 1.5rem;
+	color: #035ce8;
+}
+
+.driver-registration-title {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #0f172a;
+	margin: 0;
+}
+
+.driver-registration-close {
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	color: #6b7280;
+	transition: all 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.driver-registration-close:hover {
+	background: #f3f4f6;
+	color: #0f172a;
+}
+
+/* Progress Steps */
+.driver-registration-steps {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 2rem;
+	padding: 0 1rem;
+	position: relative;
+}
+
+.driver-registration-step-wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	flex: 1;
+	position: relative;
+}
+
+.driver-registration-step {
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: 50%;
+	background: #e5e7eb;
+	color: #6b7280;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 600;
+	font-size: 0.875rem;
+	transition: all 0.3s;
+	border: 2px solid transparent;
+}
+
+.driver-registration-step-active {
+	background: linear-gradient(135deg, #035ce8 0%, #2b73ee 100%);
+	color: white;
+	border-color: #035ce8;
+	box-shadow: 0 4px 12px rgba(3, 92, 232, 0.3);
+}
+
+.driver-registration-step-completed {
+	background: #10b981;
+	color: white;
+	border-color: #10b981;
+}
+
+.driver-registration-step-label {
+	font-size: 0.75rem;
+	color: #6b7280;
+	margin-top: 0.5rem;
+	text-align: center;
+	font-weight: 500;
+}
+
+.driver-registration-step-wrapper:has(.driver-registration-step-active) .driver-registration-step-label,
+.driver-registration-step-wrapper:has(.driver-registration-step-completed) .driver-registration-step-label {
+	color: #0f172a;
+	font-weight: 600;
+}
+
+.driver-registration-step-line {
+	position: absolute;
+	top: 1.25rem;
+	left: calc(50% + 1.25rem);
+	right: calc(-50% + 1.25rem);
+	height: 2px;
+	background: #e5e7eb;
+	z-index: -1;
+}
+
+.driver-registration-step-line-completed {
+	background: #10b981;
+}
+
+/* Form Content */
+.driver-registration-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.driver-registration-step-content {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.driver-registration-step-title {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #0f172a;
+	margin: 0;
+}
+
+.driver-registration-step-description {
+	color: #6b7280;
+	font-size: 0.875rem;
+	margin: 0;
+}
+
+.driver-registration-form-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1.25rem;
+}
+
+.driver-registration-form-group {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.driver-registration-form-group-full {
+	grid-column: 1 / -1;
+}
+
+.driver-registration-label {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #374151;
+}
+
+.driver-registration-label-content {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.driver-registration-input,
+.driver-registration-file-input {
+	width: 100%;
+	padding: 0.75rem 1rem;
+	border: 2px solid #e5e7eb;
+	border-radius: 0.75rem;
+	font-size: 0.875rem;
+	transition: all 0.2s;
+	background: white;
+	font-family: inherit;
+}
+
+.driver-registration-input:focus,
+.driver-registration-file-input:focus {
+	outline: none;
+	border-color: #035ce8;
+	box-shadow: 0 0 0 3px rgba(3, 92, 232, 0.1);
+}
+
+.driver-registration-input:disabled,
+.driver-registration-file-input:disabled {
+	background: #f9fafb;
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.driver-registration-input::placeholder {
+	color: #9ca3af;
+}
+
+.driver-registration-file-input {
+	cursor: pointer;
+}
+
+.driver-registration-checkbox-label {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+	font-size: 0.875rem;
+	color: #374151;
+}
+
+.driver-registration-checkbox {
+	width: 1.25rem;
+	height: 1.25rem;
+	cursor: pointer;
+}
+
+.driver-registration-error {
+	padding: 0.875rem 1rem;
+	background: #fee2e2;
+	border: 1px solid #fca5a5;
+	border-radius: 0.75rem;
+	color: #991b1b;
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.driver-registration-input-error {
+	border-color: #ef4444 !important;
+	background: #fef2f2;
+}
+
+.driver-registration-input-error:focus {
+	border-color: #ef4444 !important;
+	box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.driver-registration-field-error {
+	display: block;
+	margin-top: 0.25rem;
+	font-size: 0.75rem;
+	color: #dc2626;
+	font-weight: 500;
+}
+
+.driver-registration-field-validating {
+	display: block;
+	margin-top: 0.25rem;
+	font-size: 0.75rem;
+	color: #6b7280;
+	font-style: italic;
+}
+
+.driver-registration-actions {
+	display: flex;
+	gap: 1rem;
+	justify-content: flex-end;
+	margin-top: 1rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid #e5e7eb;
+}
+
+.driver-registration-actions-spacer {
+	flex: 1;
+}
+
+.driver-registration-button-secondary,
+.driver-registration-button-cancel,
+.driver-registration-button-primary {
+	padding: 0.75rem 1.5rem;
+	border-radius: 0.75rem;
+	font-weight: 600;
+	font-size: 0.875rem;
+	cursor: pointer;
+	transition: all 0.2s;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	border: none;
+}
+
+.driver-registration-button-secondary {
+	background: #f3f4f6;
+	color: #374151;
+}
+
+.driver-registration-button-secondary:hover:not(:disabled) {
+	background: #e5e7eb;
+}
+
+.driver-registration-button-cancel {
+	background: white;
+	color: #374151;
+	border: 2px solid #e5e7eb;
+}
+
+.driver-registration-button-cancel:hover:not(:disabled) {
+	background: #f9fafb;
+	border-color: #d1d5db;
+}
+
+.driver-registration-button-primary {
+	background: linear-gradient(135deg, #035ce8 0%, #2b73ee 100%);
+	color: white;
+	box-shadow: 0 4px 12px rgba(3, 92, 232, 0.3);
+}
+
+.driver-registration-button-primary:hover:not(:disabled) {
+	transform: translateY(-1px);
+	box-shadow: 0 6px 16px rgba(3, 92, 232, 0.4);
+}
+
+.driver-registration-button-primary:active:not(:disabled) {
+	transform: translateY(0);
+}
+
+.driver-registration-button-secondary:disabled,
+.driver-registration-button-cancel:disabled,
+.driver-registration-button-primary:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+	transform: none;
+}
+
+/* Success State */
+.driver-registration-success {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	padding: 2rem 1rem;
+}
+
+.driver-registration-success-icon {
+	width: 4rem;
+	height: 4rem;
+	color: #10b981;
+	margin-bottom: 1rem;
+}
+
+.driver-registration-success-title {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #0f172a;
+	margin: 0 0 0.75rem 0;
+}
+
+.driver-registration-success-message {
+	color: #6b7280;
+	font-size: 0.875rem;
+	line-height: 1.6;
+	margin: 0 0 1.5rem 0;
+	max-width: 400px;
+}
+
+.driver-registration-success-button {
+	padding: 0.75rem 2rem;
+	border: none;
+	border-radius: 0.75rem;
+	background: linear-gradient(135deg, #035ce8 0%, #2b73ee 100%);
+	color: white;
+	font-weight: 600;
+	font-size: 0.875rem;
+	cursor: pointer;
+	transition: all 0.2s;
+	box-shadow: 0 4px 12px rgba(3, 92, 232, 0.3);
+}
+
+.driver-registration-success-button:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 6px 16px rgba(3, 92, 232, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.driver-registration-container {
+		padding: 1.5rem;
+	}
+
+	.driver-registration-steps {
+		padding: 0;
+	}
+
+	.driver-registration-step-label {
+		font-size: 0.625rem;
+	}
+
+	.driver-registration-form-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.driver-registration-actions {
+		flex-direction: column-reverse;
+	}
+
+	.driver-registration-button-secondary,
+	.driver-registration-button-cancel,
+	.driver-registration-button-primary {
+		width: 100%;
+		justify-content: center;
+	}
+}
+

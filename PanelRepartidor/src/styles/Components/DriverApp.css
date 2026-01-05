@@ -1,0 +1,251 @@
+.driver-app {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.driver-app-new {
+	width: 100%;
+	min-height: 100vh;
+	position: relative;
+}
+
+.driver-stats {
+	max-width: 48rem;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 1rem;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.driver-stats-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+	.driver-stats-grid {
+		grid-template-columns: 1fr;
+		gap: 0.5rem;
+	}
+}
+
+.driver-stat-card {
+	background-color: white;
+	padding: 1.25rem;
+	border-radius: 0.75rem;
+	border: 1px solid #e2e8f0;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+	transition: all 0.3s ease;
+}
+
+.driver-stat-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.driver-stat-content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+}
+
+.driver-stat-icon {
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: 9999px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 0.5rem;
+}
+
+.driver-stat-icon-blue {
+	background-color: #dbeafe;
+}
+
+.driver-stat-icon-blue svg {
+	color: #2563eb;
+}
+
+.driver-stat-icon-orange {
+	background-color: #ffedd5;
+}
+
+.driver-stat-icon-orange svg {
+	color: #ea580c;
+}
+
+.driver-stat-icon-green {
+	background-color: #dcfce7;
+}
+
+.driver-stat-icon-green svg {
+	color: #16a34a;
+}
+
+.driver-stat-label {
+	color: #4b5563;
+	margin: 0;
+	font-size: 0.875rem;
+}
+
+.driver-stat-value {
+	color: #111827;
+	margin: 0;
+	font-weight: 600;
+}
+
+.driver-tabs {
+	display: flex;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.driver-tabs::-webkit-scrollbar {
+	display: none;
+}
+
+.driver-tab {
+	flex: 1;
+	min-width: 0;
+	padding: 0.75rem 0;
+	border-radius: 0.5rem;
+	border: none;
+	cursor: pointer;
+	transition: all 0.15s;
+	font-size: 0.875rem;
+	white-space: nowrap;
+}
+
+.driver-tab-active {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.driver-tab-inactive {
+	background-color: white;
+	color: #374151;
+	border: 1px solid #e5e7eb;
+}
+
+.driver-tab-inactive:hover {
+	background-color: #f9fafb;
+}
+
+.driver-location-warning {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	background-color: #fef3c7;
+	border: 1px solid #fbbf24;
+	border-radius: 0.75rem;
+	padding: 1rem;
+	margin-bottom: 1rem;
+	color: #92400e;
+}
+
+.driver-location-warning svg {
+	width: 1.25rem;
+	height: 1.25rem;
+	flex-shrink: 0;
+}
+
+.driver-location-warning p {
+	margin: 0;
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
+
+.driver-empty-state {
+	background-color: white;
+	padding: 2rem;
+	border-radius: 0.5rem;
+	border: 1px solid #e5e7eb;
+	text-align: center;
+}
+
+.driver-empty-icon {
+	width: 3rem;
+	height: 3rem;
+	color: #9ca3af;
+	margin: 0 auto 0.75rem;
+}
+
+.driver-empty-title {
+	color: #111827;
+	margin: 0 0 0.25rem;
+	font-weight: 600;
+}
+
+.driver-empty-text {
+	color: #4b5563;
+	margin: 0;
+}
+
+.driver-modal-overlay {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	z-index: 50;
+}
+
+.driver-modal-content {
+	background-color: white;
+	border-top-left-radius: 0.75rem;
+	border-top-right-radius: 0.75rem;
+	max-width: 42rem;
+	width: 100%;
+	max-height: 90vh;
+	overflow-y: auto;
+}
+
+@media (min-width: 640px) {
+	.driver-modal-overlay {
+		align-items: center;
+	}
+
+	.driver-modal-content {
+		border-radius: 0.75rem;
+	}
+
+	.driver-stats {
+		padding: 1.5rem;
+	}
+
+	.driver-stats-grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1rem;
+	}
+}
+
+/* Responsive para tablets */
+@media (min-width: 768px) {
+	.driver-stats {
+		max-width: 56rem;
+		padding: 2rem;
+	}
+
+	.driver-tabs {
+		gap: 1rem;
+	}
+
+	.driver-tab {
+		padding: 0.875rem 1rem;
+		font-size: 1rem;
+	}
+}

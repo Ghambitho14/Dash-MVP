@@ -1,0 +1,441 @@
+/* ====================================
+   FORMULARIO CREAR USUARIO
+   ==================================== */
+
+.formulario-crear-usuario-overlay {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(8px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 70;
+	padding: 1rem;
+	animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.formulario-crear-usuario-content {
+	background-color: white;
+	border-radius: 1rem;
+	width: 100%;
+	max-width: 28rem;
+	max-height: 90vh;
+	overflow-y: auto;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+	animation: slideUp 0.3s ease;
+	border: 1px solid var(--app-gray-200);
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	z-index: 71;
+	backdrop-filter: blur(8px);
+}
+
+@keyframes slideUp {
+	from {
+		transform: translateY(20px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+.formulario-crear-usuario-content::-webkit-scrollbar {
+	width: 0.5rem;
+}
+
+.formulario-crear-usuario-content::-webkit-scrollbar-track {
+	background: var(--app-gray-100);
+	border-radius: 0.25rem;
+}
+
+.formulario-crear-usuario-content::-webkit-scrollbar-thumb {
+	background: var(--app-gray-300);
+	border-radius: 0.25rem;
+}
+
+.formulario-crear-usuario-content::-webkit-scrollbar-thumb:hover {
+	background: var(--app-gray-400);
+}
+
+/* Header */
+.formulario-crear-usuario-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	padding: 2rem;
+	padding-bottom: 1rem;
+	border-bottom: 1px solid var(--app-gray-200);
+	flex-shrink: 0;
+}
+
+.formulario-crear-usuario-header-left {
+	display: flex;
+	align-items: flex-start;
+	gap: 1rem;
+	flex: 1;
+}
+
+.formulario-crear-usuario-header-icon {
+	width: 3rem;
+	height: 3rem;
+	background: var(--app-purple);
+	border-radius: 0.75rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+	flex-shrink: 0;
+}
+
+.formulario-crear-usuario-header-icon svg {
+	width: 1.5rem;
+	height: 1.5rem;
+	color: white;
+}
+
+.formulario-crear-usuario-title {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--app-gray-800);
+	margin: 0 0 0.25rem 0;
+}
+
+.formulario-crear-usuario-subtitle {
+	font-size: 0.875rem;
+	color: var(--app-gray-600);
+	margin: 0;
+}
+
+.formulario-crear-usuario-close {
+	width: 2.5rem;
+	height: 2.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 0.5rem;
+	border: none;
+	background: var(--app-gray-100);
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	color: var(--app-gray-600);
+	flex-shrink: 0;
+}
+
+.formulario-crear-usuario-close:hover {
+	background: var(--app-gray-200);
+	color: var(--app-gray-800);
+}
+
+.formulario-crear-usuario-close svg {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+/* Form */
+.formulario-crear-usuario {
+	padding: 2rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.formulario-crear-usuario-group {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.formulario-crear-usuario-label {
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: var(--app-gray-700);
+}
+
+.formulario-crear-usuario-label-content {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.formulario-crear-usuario-label-content svg {
+	width: 0.875rem;
+	height: 0.875rem;
+	color: var(--app-gray-500);
+}
+
+/* Input Wrapper */
+.formulario-crear-usuario-input-wrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.formulario-crear-usuario-input-icon {
+	position: absolute;
+	left: 0.875rem;
+	width: 1.25rem;
+	height: 1.25rem;
+	color: var(--app-gray-500);
+	pointer-events: none;
+	z-index: 1;
+}
+
+/* Input */
+.formulario-crear-usuario-input {
+	padding: 0.625rem 0.875rem 0.625rem 3rem;
+	border: 1px solid var(--app-gray-300);
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	transition: all var(--app-transition-base);
+	background-color: white;
+	color: var(--app-gray-800);
+	width: 100%;
+}
+
+.formulario-crear-usuario-input:focus {
+	outline: none;
+	border-color: var(--app-purple);
+	box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.formulario-crear-usuario-input::placeholder {
+	color: var(--app-gray-400);
+}
+
+.formulario-crear-usuario-input:disabled {
+	background-color: var(--app-gray-100);
+	color: var(--app-gray-600);
+	cursor: not-allowed;
+}
+
+.formulario-crear-usuario-input-error {
+	border-color: var(--app-red);
+	background-color: rgba(239, 68, 68, 0.05);
+}
+
+.formulario-crear-usuario-input-error:focus {
+	border-color: var(--app-red);
+	box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.formulario-crear-usuario-error {
+	font-size: 0.875rem;
+	color: var(--app-red);
+	margin-top: 0.25rem;
+}
+
+.formulario-crear-usuario-hint {
+	font-size: 0.75rem;
+	color: var(--app-gray-600);
+	margin-top: 0.25rem;
+}
+
+/* Role Buttons */
+.formulario-crear-usuario-role-buttons {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 0.75rem;
+}
+
+.formulario-crear-usuario-role-buttons-3 {
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.formulario-crear-usuario-role-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.625rem 1rem;
+	border-radius: 0.5rem;
+	border: 1px solid;
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+.formulario-crear-usuario-role-button svg {
+	width: 1rem;
+	height: 1rem;
+}
+
+.formulario-crear-usuario-role-button-active {
+	background-color: var(--app-purple);
+	color: white;
+	border-color: var(--app-purple);
+	box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+.formulario-crear-usuario-role-button-inactive {
+	background-color: white;
+	color: var(--app-gray-700);
+	border-color: var(--app-gray-300);
+}
+
+.formulario-crear-usuario-role-button-inactive:hover {
+	border-color: var(--app-purple);
+	background-color: rgba(139, 92, 246, 0.05);
+	color: var(--app-purple);
+}
+
+/* Local Grid */
+.formulario-crear-usuario-local-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+	gap: 0.75rem;
+}
+
+.formulario-crear-usuario-local-grid-3 {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.formulario-crear-usuario-local-grid-4 {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.formulario-crear-usuario-local-grid-5 {
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.formulario-crear-usuario-local-button {
+	padding: 0.625rem 1rem;
+	border-radius: 0.5rem;
+	border: 1px solid;
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+.formulario-crear-usuario-local-button-active {
+	background-color: var(--app-purple);
+	color: white;
+	border-color: var(--app-purple);
+	box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+.formulario-crear-usuario-local-button-inactive {
+	background-color: white;
+	color: var(--app-gray-700);
+	border-color: var(--app-gray-300);
+}
+
+.formulario-crear-usuario-local-button-inactive:hover {
+	border-color: var(--app-purple);
+	background-color: rgba(139, 92, 246, 0.05);
+	color: var(--app-purple);
+}
+
+/* No Locals Message */
+.formulario-crear-usuario-no-locals {
+	padding: 1rem;
+	background-color: rgba(245, 158, 11, 0.1);
+	border: 1px solid var(--app-orange);
+	border-radius: 0.5rem;
+	text-align: center;
+}
+
+.formulario-crear-usuario-no-locals-text {
+	font-size: 0.875rem;
+	color: #92400e;
+	margin: 0;
+	line-height: 1.5;
+}
+
+/* Actions */
+.formulario-crear-usuario-actions {
+	display: flex;
+	gap: 0.75rem;
+	padding-top: 0.5rem;
+	border-top: 1px solid var(--app-gray-200);
+	margin-top: 0.5rem;
+}
+
+.formulario-crear-usuario-button {
+	flex: 1;
+	padding: 0.75rem 1.5rem;
+	border-radius: 0.5rem;
+	border: none;
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	font-weight: 500;
+	font-size: 0.875rem;
+}
+
+.formulario-crear-usuario-button-secondary {
+	background-color: white;
+	color: var(--app-gray-700);
+	border: 1px solid var(--app-gray-300);
+}
+
+.formulario-crear-usuario-button-secondary:hover {
+	background-color: var(--app-gray-50);
+	border-color: var(--app-gray-400);
+}
+
+.formulario-crear-usuario-button-primary {
+	background: var(--app-purple);
+	color: white;
+	box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.formulario-crear-usuario-button-primary:hover {
+	background: #7c3aed;
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+	.formulario-crear-usuario-overlay {
+		padding: 0;
+		align-items: flex-end;
+	}
+
+	.formulario-crear-usuario-content {
+		border-radius: 1rem 1rem 0 0;
+		max-height: 95vh;
+		border-bottom: none;
+	}
+
+	.formulario-crear-usuario-header {
+		padding: 1.5rem;
+	}
+
+	.formulario-crear-usuario {
+		padding: 1.5rem;
+	}
+
+	.formulario-crear-usuario-role-buttons {
+		grid-template-columns: 1fr;
+	}
+
+	.formulario-crear-usuario-role-buttons-3 {
+		grid-template-columns: 1fr;
+	}
+
+	.formulario-crear-usuario-actions {
+		flex-direction: column;
+	}
+
+	.formulario-crear-usuario-button {
+		width: 100%;
+	}
+}

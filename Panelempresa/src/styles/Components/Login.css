@@ -1,0 +1,416 @@
+.login-contenedor {
+	min-height: 100vh;
+	background: linear-gradient(135deg, #035ce8 0%, #2b73ee 50%, #528af4 100%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem;
+	position: relative;
+	overflow: hidden;
+}
+
+.login-contenedor::before {
+	content: '';
+	position: absolute;
+	top: -30%;
+	left: -20%;
+	width: 600px;
+	height: 600px;
+	background: radial-gradient(circle, rgba(161, 184, 255, 0.2) 0%, transparent 70%);
+	border-radius: 50%;
+	animation: float 20s ease-in-out infinite;
+}
+
+.login-contenedor::after {
+	content: '';
+	position: absolute;
+	bottom: -20%;
+	right: -10%;
+	width: 500px;
+	height: 500px;
+	background: radial-gradient(circle, rgba(122, 161, 249, 0.15) 0%, transparent 70%);
+	border-radius: 50%;
+	animation: float 15s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+	0%, 100% {
+		transform: translate(0, 0) scale(1);
+	}
+	50% {
+		transform: translate(30px, -30px) scale(1.1);
+	}
+}
+
+.login-envoltorio {
+	width: 100%;
+	max-width: 950px;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	background: rgba(255, 255, 255, 0.08);
+	backdrop-filter: blur(20px);
+	border-radius: 2rem;
+	overflow: hidden;
+	box-shadow: 0 30px 80px rgba(3, 92, 232, 0.3),
+	            0 0 0 1px rgba(255, 255, 255, 0.1);
+	position: relative;
+	z-index: 1;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Lado izquierdo - Ilustración */
+.login-marca-lado {
+	padding: 3rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	background: linear-gradient(135deg, rgba(3, 92, 232, 0.3) 0%, rgba(43, 115, 238, 0.2) 100%);
+}
+
+.login-ilustracion {
+	width: 100%;
+	max-width: 380px;
+	margin-bottom: 2.5rem;
+	position: relative;
+}
+
+.login-ilustracion-escena {
+	position: relative;
+	width: 100%;
+	height: 280px;
+}
+
+/* Montañas de fondo */
+.login-montana {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 140px;
+	background: linear-gradient(135deg, rgba(82, 138, 244, 0.4) 0%, rgba(122, 161, 249, 0.3) 100%);
+	clip-path: polygon(0 100%, 0 60%, 25% 40%, 50% 55%, 75% 30%, 100% 50%, 100% 100%);
+	border-radius: 0 0 1.5rem 1.5rem;
+}
+
+.login-montana-atras {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 100px;
+	background: linear-gradient(135deg, rgba(122, 161, 249, 0.2) 0%, rgba(161, 184, 255, 0.15) 100%);
+	clip-path: polygon(0 100%, 0 70%, 30% 50%, 60% 65%, 100% 40%, 100% 100%);
+	border-radius: 0 0 1.5rem 1.5rem;
+}
+
+/* Luna/Sol */
+.login-celestial {
+	position: absolute;
+	top: 30%;
+	right: 25%;
+	width: 80px;
+	height: 80px;
+	background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+	border-radius: 50%;
+	box-shadow: 0 0 40px rgba(251, 191, 36, 0.6),
+	            0 0 80px rgba(251, 191, 36, 0.3);
+	animation: glow 3s ease-in-out infinite;
+}
+
+@keyframes glow {
+	0%, 100% {
+		box-shadow: 0 0 40px rgba(251, 191, 36, 0.6),
+		            0 0 80px rgba(251, 191, 36, 0.3);
+	}
+	50% {
+		box-shadow: 0 0 60px rgba(251, 191, 36, 0.8),
+		            0 0 100px rgba(251, 191, 36, 0.4);
+	}
+}
+
+/* Estrellas */
+.login-estrellas {
+	position: absolute;
+	top: 10%;
+	left: 10%;
+	width: 80%;
+	height: 50%;
+}
+
+.login-estrella {
+	position: absolute;
+	width: 3px;
+	height: 3px;
+	background: white;
+	border-radius: 50%;
+	box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+	animation: twinkle 2s ease-in-out infinite;
+}
+
+.login-estrella:nth-child(1) { top: 20%; left: 15%; animation-delay: 0s; }
+.login-estrella:nth-child(2) { top: 35%; left: 45%; animation-delay: 0.5s; }
+.login-estrella:nth-child(3) { top: 15%; left: 75%; animation-delay: 1s; }
+.login-estrella:nth-child(4) { top: 45%; left: 25%; animation-delay: 1.5s; }
+.login-estrella:nth-child(5) { top: 25%; left: 85%; animation-delay: 0.8s; }
+
+@keyframes twinkle {
+	0%, 100% { opacity: 0.3; }
+	50% { opacity: 1; }
+}
+
+/* Nubes */
+.login-nube {
+	position: absolute;
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 50px;
+	animation: drift 20s linear infinite;
+}
+
+.login-nube:nth-child(1) {
+	width: 80px;
+	height: 20px;
+	top: 20%;
+	left: -80px;
+}
+
+.login-nube:nth-child(2) {
+	width: 100px;
+	height: 25px;
+	top: 40%;
+	left: -100px;
+	animation-delay: 5s;
+	animation-duration: 25s;
+}
+
+@keyframes drift {
+	from { transform: translateX(0); }
+	to { transform: translateX(calc(100vw + 100px)); }
+}
+
+.login-ilustracion-texto {
+	text-align: center;
+	color: white;
+	margin-top: 1rem;
+}
+
+.login-ilustracion-titulo {
+	font-size: 1.125rem;
+	font-weight: 600;
+	margin-bottom: 0.5rem;
+	text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.login-ilustracion-subtitulo {
+	font-size: 0.875rem;
+	color: rgba(255, 255, 255, 0.85);
+	line-height: 1.5;
+}
+
+/* Lado derecho - Formulario */
+.login-formulario-lado {
+	padding: 3rem;
+	background: white;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.login-encabezado {
+	margin-bottom: 2rem;
+}
+
+.login-saludo {
+	font-size: 1.75rem;
+	font-weight: 700;
+	color: #0f172a;
+	margin-bottom: 0.25rem;
+	line-height: 1.3;
+}
+
+.login-saludo-destacado {
+	color: #035ce8;
+	display: block;
+}
+
+.login-subtitulo {
+	color: #64748b;
+	font-size: 0.9375rem;
+	font-weight: 500;
+	margin-top: 0.5rem;
+}
+
+.login-formulario-contenedor {
+	width: 100%;
+}
+
+.login-formulario {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.login-formulario-grupo {
+	display: flex;
+	flex-direction: column;
+}
+
+.login-etiqueta {
+	color: #475569;
+	margin-bottom: 0.5rem;
+	font-weight: 500;
+	font-size: 0.875rem;
+}
+
+.login-etiqueta-contenido {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.login-entrada {
+	padding: 0.875rem 1rem;
+	border: 2px solid #e2e8f0;
+	border-radius: 0.625rem;
+	font-size: 0.9375rem;
+	transition: all 0.2s ease;
+	background: #f8fafc;
+	color: #0f172a;
+}
+
+.login-entrada::placeholder {
+	color: #94a3b8;
+}
+
+.login-entrada:focus {
+	outline: none;
+	border-color: #2b73ee;
+	background: white;
+	box-shadow: 0 0 0 4px rgba(43, 115, 238, 0.1);
+}
+
+.login-entrada:hover:not(:focus) {
+	border-color: #cbd5e1;
+	background: white;
+}
+
+.login-olvidaste-contraseña {
+	text-align: right;
+	margin-top: -0.5rem;
+}
+
+.login-olvidaste-contraseña span {
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+.login-placeholder {
+	color: #999;
+	cursor: not-allowed;
+	opacity: 0.7;
+}
+
+.login-error {
+	background: #fef2f2;
+	color: #dc2626;
+	padding: 0.875rem 1rem;
+	border-radius: 0.625rem;
+	font-size: 0.875rem;
+	border: 1px solid #fecaca;
+	font-weight: 500;
+}
+
+.login-boton {
+	width: 100%;
+	background: linear-gradient(135deg, #035ce8 0%, #2b73ee 100%);
+	color: white;
+	padding: 1rem;
+	border-radius: 0.625rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	border: none;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	font-weight: 600;
+	font-size: 0.9375rem;
+	box-shadow: 0 4px 14px rgba(3, 92, 232, 0.3);
+	margin-top: 0.5rem;
+}
+
+.login-boton:hover {
+	background: linear-gradient(135deg, #2b73ee 0%, #528af4 100%);
+	box-shadow: 0 6px 20px rgba(3, 92, 232, 0.4);
+	transform: translateY(-2px);
+}
+
+.login-boton:active {
+	transform: translateY(0);
+}
+
+.login-boton:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	transform: none;
+}
+
+.login-crear-cuenta {
+	text-align: center;
+	margin-top: 1.5rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid #e2e8f0;
+}
+
+.login-crear-cuenta-texto {
+	color: #64748b;
+	font-size: 0.875rem;
+}
+
+.login-crear-cuenta-enlace {
+	background: none;
+	border: none;
+	color: #035ce8;
+	font-weight: 600;
+	text-decoration: none;
+	margin-left: 0.25rem;
+	transition: color 0.2s ease;
+	cursor: pointer;
+	font-size: inherit;
+	font-family: inherit;
+	padding: 0;
+}
+
+.login-crear-cuenta-enlace:hover {
+	color: #2b73ee;
+	text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+	.login-envoltorio {
+		grid-template-columns: 1fr;
+		max-width: 460px;
+	}
+
+	.login-marca-lado {
+		display: none;
+	}
+
+	.login-formulario-lado {
+		padding: 2.5rem 2rem;
+	}
+}
+
+@media (max-width: 640px) {
+	.login-contenedor {
+		padding: 1rem;
+	}
+
+	.login-formulario-lado {
+		padding: 2rem 1.5rem;
+	}
+
+	.login-saludo {
+		font-size: 1.5rem;
+	}
+}

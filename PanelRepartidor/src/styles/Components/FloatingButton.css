@@ -1,0 +1,239 @@
+/* =========================
+   FLOATING BUTTON (BURBUJA FLOTANTE)
+========================= */
+
+.floating-button-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: 999;
+}
+
+.floating-button {
+	width: 3.5rem;
+	height: 3.5rem;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #2b73ee 0%, #528af4 100%);
+	border: none;
+	box-shadow: 0 8px 24px rgba(43, 115, 238, 0.4),
+		0 0 0 4px rgba(43, 115, 238, 0.1);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	z-index: 1000;
+	pointer-events: auto;
+	transition: box-shadow 0.3s ease;
+	touch-action: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.floating-button:hover {
+	box-shadow: 0 12px 32px rgba(43, 115, 238, 0.5),
+		0 0 0 6px rgba(43, 115, 238, 0.15);
+}
+
+.floating-button:active {
+	box-shadow: 0 4px 16px rgba(43, 115, 238, 0.3),
+		0 0 0 2px rgba(43, 115, 238, 0.1);
+}
+
+.floating-button-icon {
+	width: 1.5rem;
+	height: 1.5rem;
+	color: white;
+	filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+	pointer-events: none;
+}
+
+.floating-button-badge {
+	position: absolute;
+	top: -0.25rem;
+	right: -0.25rem;
+	background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+	color: white;
+	font-size: 0.75rem;
+	font-weight: 700;
+	min-width: 1.5rem;
+	height: 1.5rem;
+	border-radius: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 0.5rem;
+	box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5),
+		0 0 0 2px white;
+	z-index: 1001;
+	pointer-events: none;
+}
+
+/* Animación de pulso para el botón */
+@keyframes floatingPulse {
+	0%, 100% {
+		box-shadow: 0 8px 24px rgba(43, 115, 238, 0.4),
+			0 0 0 4px rgba(43, 115, 238, 0.1);
+	}
+	50% {
+		box-shadow: 0 12px 32px rgba(43, 115, 238, 0.6),
+			0 0 0 8px rgba(43, 115, 238, 0.2);
+	}
+}
+
+.floating-button:not(:active) {
+	animation: floatingPulse 3s ease-in-out infinite;
+}
+
+/* Overlay para el panel modal */
+.floating-button-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+	backdrop-filter: blur(4px);
+	pointer-events: auto;
+}
+
+/* Panel expandible tipo Messenger */
+.floating-button-panel {
+	width: 380px;
+	max-width: calc(100vw - 2rem);
+	max-height: 500px;
+	background: white;
+	border-radius: 1rem;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
+		0 0 0 1px rgba(0, 0, 0, 0.05);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	z-index: 1001;
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	pointer-events: auto;
+}
+
+.floating-button-panel-header {
+	background: linear-gradient(135deg, #2b73ee 0%, #528af4 100%);
+	padding: 1rem 1.25rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	color: white;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.floating-button-panel-title {
+	margin: 0;
+	font-size: 1.125rem;
+	font-weight: 600;
+	color: white;
+}
+
+.floating-button-panel-count {
+	background: rgba(255, 255, 255, 0.2);
+	padding: 0.25rem 0.75rem;
+	border-radius: 1rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+.floating-button-panel-content {
+	flex: 1;
+	overflow-y: auto;
+	overflow-x: hidden;
+	max-height: 420px;
+}
+
+.floating-button-panel-content::-webkit-scrollbar {
+	width: 6px;
+}
+
+.floating-button-panel-content::-webkit-scrollbar-track {
+	background: #f1f5f9;
+}
+
+.floating-button-panel-content::-webkit-scrollbar-thumb {
+	background: #cbd5e1;
+	border-radius: 3px;
+}
+
+.floating-button-panel-content::-webkit-scrollbar-thumb:hover {
+	background: #94a3b8;
+}
+
+.floating-button-panel-orders {
+	padding: 0.75rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.floating-button-order-item {
+	animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.floating-button-panel-empty {
+	padding: 3rem 1.5rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	gap: 1rem;
+}
+
+.floating-button-panel-empty-icon {
+	width: 3rem;
+	height: 3rem;
+	color: #cbd5e1;
+}
+
+.floating-button-panel-empty-text {
+	margin: 0;
+	color: #64748b;
+	font-size: 0.875rem;
+}
+
+/* Ajustar OrderCard dentro del panel */
+.floating-button-panel .order-card-new {
+	margin: 0;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.floating-button {
+		width: 3.25rem;
+		height: 3.25rem;
+	}
+
+	.floating-button-icon {
+		width: 1.375rem;
+		height: 1.375rem;
+	}
+
+	.floating-button-panel {
+		width: calc(100vw - 2rem);
+		max-height: 60vh;
+	}
+}
+

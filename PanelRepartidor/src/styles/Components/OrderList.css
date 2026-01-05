@@ -1,0 +1,18 @@
+.order-list-empty {
+	background-color: white;
+	padding: 2rem;
+	border-radius: 0.5rem;
+	border: 1px solid #e5e7eb;
+	text-align: center;
+}
+
+.order-list-empty-text {
+	color: #4b5563;
+}
+
+.order-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+

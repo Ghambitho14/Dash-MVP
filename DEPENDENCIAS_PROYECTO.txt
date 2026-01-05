@@ -1,0 +1,109 @@
+================================================================================
+DEPENDENCIAS Y TECNOLOGÍAS DEL PROYECTO
+Sistema de Delivery - Diciembre 2024
+================================================================================
+
+TECNOLOGÍAS PRINCIPALES
+-----------------------
+- JavaScript (ES6+)
+- React 18.2.0 / 19.2.0
+- Vite 5.0.8 / 7.2.4 / 7.2.7
+- Supabase (PostgreSQL + Backend + Realtime)
+- Node.js 16+
+- Express.js 4.18.2
+- Capacitor 6.0.0 (solo App Repartidor)
+
+================================================================================
+DEPENDENCIAS POR APLICACIÓN
+================================================================================
+
+1. DELIVERYAPP (Panelempresa/) - Puerto 5173
+--------------------------------------------
+Producción:
+  @supabase/supabase-js: ^2.87.1
+  bcryptjs: ^3.0.3
+  express: ^4.18.2
+  lucide-react: ^0.294.0
+  react: ^18.2.0
+  react-dom: ^18.2.0
+  react-hot-toast: ^2.6.0
+
+Desarrollo:
+  @vitejs/plugin-react: ^4.2.1
+  autoprefixer: ^10.4.16
+  postcss: ^8.4.32
+  vite: ^5.0.8
+
+2. PANEL ADMIN (Paneladmin/) - Puerto 5174
+-------------------------------------------
+Producción:
+  @supabase/supabase-js: ^2.87.1
+  bcryptjs: ^3.0.3
+  lucide-react: ^0.559.0
+  react: ^19.2.0
+  react-dom: ^19.2.0
+  react-hot-toast: ^2.6.0
+
+Desarrollo:
+  @eslint/js: ^9.39.1
+  @types/react: ^19.2.5
+  @types/react-dom: ^19.2.3
+  @vitejs/plugin-react: ^5.1.1
+  eslint: ^9.39.1
+  eslint-plugin-react-hooks: ^7.0.1
+  eslint-plugin-react-refresh: ^0.4.24
+  globals: ^16.5.0
+  vite: ^7.2.4
+
+3. APP REPARTIDOR (PanelRepartidor/) - Puerto 5175
+---------------------------------------------------
+Producción:
+  @supabase/supabase-js: ^2.87.1
+  @capacitor/geolocation: ^6.0.0
+  @capacitor/preferences: ^6.0.0
+  bcryptjs: ^3.0.3
+  canvas-confetti: ^1.9.4
+  framer-motion: ^12.23.26
+  lucide-react: ^0.294.0
+  react: ^18.2.0
+  react-dom: ^18.2.0
+  react-hot-toast: ^2.6.0
+
+Desarrollo:
+  @capacitor/android: ^6.0.0
+  @capacitor/cli: ^6.0.0
+  @capacitor/core: ^6.0.0
+  @vitejs/plugin-react: ^4.2.1
+  autoprefixer: ^10.4.16
+  postcss: ^8.4.32
+  vite: ^7.2.7
+
+4. SERVIDOR UNIFICADO (servidor/)
+---------------------------------
+  express: ^4.18.2
+  @supabase/supabase-js: ^2.87.1
+  bcryptjs: ^3.0.3
+
+================================================================================
+SERVICIOS EXTERNOS
+================================================================================
+- Google Maps JavaScript API (mapas, geolocalización, rutas)
+- Supabase API (base de datos, autenticación, Realtime)
+
+================================================================================
+BASE DE DATOS (Supabase/PostgreSQL)
+================================================================================
+Tablas principales:
+  companies, company_users, drivers, locals, clients, orders,
+  order_status_history, order_chats, order_chat_messages, superadmins
+
+Características:
+  PostgreSQL, Realtime, Row Level Security (RLS), Triggers, Functions
+
+================================================================================
+HERRAMIENTAS Y ESTILOS
+================================================================================
+- CSS Modules (estilos por componente)
+- ESLint (solo Paneladmin)
+- Android Studio (para compilar APK)
+

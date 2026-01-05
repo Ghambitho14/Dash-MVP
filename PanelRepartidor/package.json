@@ -1,0 +1,38 @@
+{
+	"name": "delivery-app-repartidor",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+		"preview": "vite preview",
+		"cap:add:android": "npx cap add android",
+		"cap:sync": "npx cap sync",
+		"cap:open:android": "npx cap open android",
+		"android:build": "npm run build && npx cap sync && npx cap open android",
+		"apk:build": "npm run build && npx cap sync"
+	},
+	"dependencies": {
+		"@supabase/supabase-js": "^2.87.1",
+		"@capacitor/geolocation": "^6.0.0",
+		"@capacitor/preferences": "^6.0.0",
+		"bcryptjs": "^3.0.3",
+		"canvas-confetti": "^1.9.4",
+		"framer-motion": "^12.23.26",
+		"lucide-react": "^0.294.0",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"react-hot-toast": "^2.6.0"
+	},
+	"devDependencies": {
+		"@capacitor/android": "^6.0.0",
+		"@capacitor/cli": "^6.0.0",
+		"@capacitor/core": "^6.0.0",
+		"@vitejs/plugin-react": "^4.2.1",
+		"autoprefixer": "^10.4.16",
+		"postcss": "^8.4.32",
+		"vite": "^7.2.7"
+	}
+}

@@ -1,0 +1,117 @@
+/* ====================================
+   MODAL DE CONFIGURACIÓN
+   ==================================== */
+
+.modal-configuracion {
+	padding: 2rem;
+}
+
+.modal-configuracion-titulo {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--app-gray-800);
+	margin: 0 0 1.5rem 0;
+}
+
+.modal-configuracion-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1rem;
+}
+
+.modal-configuracion-item {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 1.25rem;
+	background: white;
+	border: 1px solid var(--app-gray-200);
+	border-radius: 0.75rem;
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	text-align: left;
+	width: 100%;
+}
+
+.modal-configuracion-item:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	border-color: var(--app-gray-300);
+	background: var(--app-gray-50);
+}
+
+.modal-configuracion-icono {
+	width: 3rem;
+	height: 3rem;
+	border-radius: 0.75rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.modal-configuracion-icono svg {
+	width: 1.5rem;
+	height: 1.5rem;
+	color: white;
+}
+
+.modal-configuracion-icono-blue {
+	background: var(--app-blue-primary);
+}
+
+.modal-configuracion-icono-purple {
+	background: var(--app-purple);
+}
+
+.modal-configuracion-icono-green {
+	background: var(--app-green);
+}
+
+.modal-configuracion-icono-orange {
+	background: #f97316;
+}
+
+.modal-configuracion-contenido {
+	flex: 1;
+	min-width: 0;
+}
+
+.modal-configuracion-nombre {
+	font-size: 1rem;
+	font-weight: 600;
+	color: var(--app-gray-800);
+	margin: 0 0 0.25rem 0;
+}
+
+.modal-configuracion-descripcion {
+	font-size: 0.875rem;
+	color: var(--app-gray-600);
+	margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+	.modal-configuracion {
+		padding: 1.5rem;
+	}
+
+	.modal-configuracion-titulo {
+		font-size: 1.25rem;
+	}
+
+	.modal-configuracion-item {
+		padding: 1rem;
+	}
+
+	.modal-configuracion-icono {
+		width: 2.5rem;
+		height: 2.5rem;
+	}
+
+	.modal-configuracion-icono svg {
+		width: 1.25rem;
+		height: 1.25rem;
+	}
+}
+

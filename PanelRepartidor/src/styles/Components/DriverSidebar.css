@@ -1,0 +1,192 @@
+.driver-sidebar-overlay {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 60;
+	backdrop-filter: blur(4px);
+}
+
+.driver-sidebar {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 70;
+	width: 16rem;
+	background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+	border-right: 1px solid #e2e8f0;
+	display: flex;
+	flex-direction: column;
+	transform: translateX(-100%);
+	transition: transform 0.3s ease-in-out;
+	box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.driver-sidebar-open {
+	transform: translateX(0);
+}
+
+.driver-sidebar-header {
+	padding: 1.5rem;
+	border-bottom: 1px solid #e2e8f0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.driver-sidebar-user {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	flex: 1;
+}
+
+.driver-sidebar-avatar {
+	width: 3rem;
+	height: 3rem;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	border-radius: 0.75rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.driver-sidebar-avatar svg {
+	width: 1.5rem;
+	height: 1.5rem;
+	color: white;
+}
+
+.driver-sidebar-user-info h3 {
+	color: #111827;
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.driver-sidebar-user-info p {
+	color: #4b5563;
+	margin: 0;
+	font-size: 0.875rem;
+}
+
+.driver-sidebar-close {
+	padding: 0.5rem;
+	border: none;
+	background: none;
+	cursor: pointer;
+	border-radius: 0.5rem;
+	transition: background-color 0.15s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.driver-sidebar-close:hover {
+	background-color: #f3f4f6;
+}
+
+.driver-sidebar-close svg {
+	width: 1.25rem;
+	height: 1.25rem;
+	color: #4b5563;
+}
+
+/* La app de repartidor es solo móvil, no hay estilos de desktop */
+
+.driver-sidebar-nav {
+	flex: 1;
+	padding: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	overflow-y: auto;
+}
+
+.driver-sidebar-item {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.875rem 1rem;
+	border-radius: 0.75rem;
+	border: none;
+	background: none;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	color: #4b5563;
+	font-size: 0.875rem;
+	font-weight: 500;
+	text-align: left;
+}
+
+.driver-sidebar-item:hover {
+	background-color: #f3f4f6;
+	color: #111827;
+}
+
+.driver-sidebar-item-active {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.driver-sidebar-item-active:hover {
+	background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+	color: white;
+}
+
+.driver-sidebar-item svg {
+	width: 1.25rem;
+	height: 1.25rem;
+	flex-shrink: 0;
+}
+
+/* Responsive para tablets y desktop */
+@media (min-width: 768px) {
+	.driver-sidebar {
+		position: fixed;
+		transform: translateX(0);
+		width: 18rem;
+		top: 4rem;
+		height: calc(100vh - 4rem);
+	}
+
+	.driver-sidebar-overlay {
+		display: none;
+	}
+
+	.driver-sidebar-close {
+		display: none;
+	}
+}
+
+/* Responsive para móvil */
+@media (max-width: 640px) {
+	.driver-sidebar {
+		width: 100%;
+		max-width: 20rem;
+	}
+
+	.driver-sidebar-header {
+		padding: 1rem;
+	}
+
+	.driver-sidebar-user-info h3 {
+		font-size: 0.9375rem;
+	}
+
+	.driver-sidebar-user-info p {
+		font-size: 0.8125rem;
+	}
+
+	.driver-sidebar-item {
+		padding: 0.75rem;
+		font-size: 0.8125rem;
+	}
+}
+

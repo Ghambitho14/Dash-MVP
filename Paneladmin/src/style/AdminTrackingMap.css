@@ -1,0 +1,134 @@
+.admin-tracking-map-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 600px;
+	background: white;
+	border-radius: 0.5rem;
+	overflow: hidden;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.admin-tracking-map-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1rem 1.5rem;
+	background: #f9fafb;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-tracking-map-legend {
+	display: flex;
+	gap: 1.5rem;
+	align-items: center;
+}
+
+.admin-tracking-legend-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.875rem;
+	color: #6b7280;
+}
+
+.admin-tracking-legend-marker {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	border: 2px solid white;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.admin-tracking-legend-driver {
+	background: #ef4444;
+}
+
+.admin-tracking-map-stats {
+	font-size: 0.875rem;
+	color: #6b7280;
+	font-weight: 500;
+}
+
+.admin-tracking-map-content {
+	flex: 1;
+	position: relative;
+}
+
+.admin-tracking-map {
+	width: 100%;
+	height: 100%;
+	min-height: 600px;
+}
+
+.admin-tracking-map-loading,
+.admin-tracking-map-error,
+.admin-tracking-map-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem;
+	text-align: center;
+	min-height: 600px;
+	background: white;
+	border-radius: 0.5rem;
+}
+
+.admin-tracking-map-loading svg,
+.admin-tracking-map-error svg,
+.admin-tracking-map-empty svg {
+	width: 3rem;
+	height: 3rem;
+	color: #6b7280;
+	margin-bottom: 1rem;
+}
+
+.admin-tracking-map-loading h3,
+.admin-tracking-map-error h3,
+.admin-tracking-map-empty h3 {
+	margin: 0 0 0.5rem 0;
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: #111827;
+}
+
+.admin-tracking-map-loading p,
+.admin-tracking-map-error p,
+.admin-tracking-map-empty p {
+	margin: 0;
+	font-size: 0.875rem;
+	color: #6b7280;
+}
+
+.admin-tracking-map-error svg {
+	color: #ef4444;
+}
+
+.admin-tracking-map-error h3 {
+	color: #ef4444;
+}
+
+@media (max-width: 768px) {
+	.admin-tracking-map-container {
+		min-height: 400px;
+	}
+
+	.admin-tracking-map {
+		min-height: 400px;
+	}
+
+	.admin-tracking-map-loading,
+	.admin-tracking-map-error,
+	.admin-tracking-map-empty {
+		min-height: 400px;
+		padding: 2rem;
+	}
+
+	.admin-tracking-map-header {
+		flex-direction: column;
+		gap: 1rem;
+		align-items: flex-start;
+	}
+}
+

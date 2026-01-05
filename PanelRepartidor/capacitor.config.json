@@ -1,0 +1,15 @@
+{
+	"appId": "com.deliveryapp.repartidor",
+	"appName": "DeliveryApp Repartidor",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https"
+	},
+	"android": {
+		"buildOptions": {
+			"keystorePath": null,
+			"keystoreAlias": null
+		}
+	}
+}
+
