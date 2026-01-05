@@ -72,8 +72,3 @@ El APK estará en: `android/app/build/outputs/apk/debug/app-debug.apk`
 
 
 
-
-## Documentación
-
-- `../ARCHITECTURE.md`: Arquitectura completa del proyecto
-- `../AGENTS.MD`: Guía para agentes de IA

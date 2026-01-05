@@ -1,23 +1,10 @@
 # DeliveryApp - Aplicación Empresarial
 
-Aplicación web para empresas y administradores locales para gestionar pedidos, clientes, usuarios y locales.
-
-## Inicio Rápido
-
 ### Instalación
 
 ```bash
 cd Panelempresa
 npm install
-```
-
-### Configuración
-
-Crea el archivo `.env` en la **raíz del proyecto** (`App/.env`):
-
-```env
-VITE_PROJECT_URL=https://tu-proyecto.supabase.co
-VITE_ANNON_KEY=tu_anon_key_aqui
 ```
 
 ### Desarrollo
@@ -26,7 +13,6 @@ VITE_ANNON_KEY=tu_anon_key_aqui
 npm run dev
 ```
 
-La aplicación estará disponible en `http://localhost:5173`
 
 ### Compilación
 
@@ -34,7 +20,6 @@ La aplicación estará disponible en `http://localhost:5173`
 npm run build
 ```
 
-Los archivos compilados estarán en `dist/`
 
 ## Funcionalidades
 
@@ -61,8 +46,3 @@ npm run preview  # Preview de build
 npm run lint     # Linter
 ```
 
-## Documentación
-
-- `../ARCHITECTURE.md`: Arquitectura completa del proyecto
-- `../AGENTS.MD`: Guía para agentes de IA
-- `Database/README.md`: Documentación de base de datos
