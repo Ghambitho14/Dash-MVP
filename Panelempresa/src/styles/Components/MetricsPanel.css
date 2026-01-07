@@ -1,0 +1,551 @@
+/* ====================================
+   METRICS PANEL
+   ==================================== */
+
+.metrics-panel {
+	width: 100%;
+	height: 100%;
+	background: white;
+	border-radius: var(--app-radius-xl);
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.metrics-panel-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 1.5rem;
+	border-bottom: 1px solid var(--app-border-light);
+	background: white;
+	position: sticky;
+	top: 0;
+	z-index: 10;
+}
+
+.metrics-panel-header-content {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.metrics-panel-header-right {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.metrics-panel-header-content svg {
+	color: var(--app-primary);
+}
+
+.metrics-panel-header h2 {
+	margin: 0;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--app-gray-900);
+}
+
+.metrics-panel-close {
+	width: 2rem;
+	height: 2rem;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	border-radius: var(--app-radius-md);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--app-gray-600);
+	transition: all var(--app-transition-base);
+}
+
+.metrics-panel-close:hover {
+	background: var(--app-gray-100);
+	color: var(--app-gray-900);
+}
+
+.metrics-panel-close svg {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+.metrics-panel-content {
+	flex: 1;
+	overflow-y: auto;
+	padding: 1.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+.metrics-loading {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	padding: 4rem;
+	color: var(--app-gray-600);
+}
+
+.metrics-loading svg {
+	color: var(--app-primary);
+	animation: pulse 2s ease-in-out infinite;
+}
+
+/* ====================================
+   LEVELS
+   ==================================== */
+
+.metrics-level {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.metrics-level-header {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 0.5rem;
+}
+
+.metrics-level-badge {
+	background: linear-gradient(135deg, var(--app-primary), var(--app-accent));
+	color: white;
+	padding: 0.25rem 0.75rem;
+	border-radius: var(--app-radius-full);
+	font-size: 0.75rem;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.metrics-level-header h3 {
+	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var(--app-gray-900);
+}
+
+/* ====================================
+   SECTIONS
+   ==================================== */
+
+.metrics-section {
+	background: white;
+	border-radius: var(--app-radius-lg);
+	padding: 1.5rem;
+	box-shadow: var(--app-shadow-sm);
+	border: 1px solid var(--app-border-light);
+}
+
+.metrics-section-title {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 1.25rem;
+}
+
+.metrics-section-title svg {
+	color: var(--app-primary);
+}
+
+.metrics-section-title h4 {
+	margin: 0;
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: var(--app-gray-900);
+}
+
+.metrics-subsection {
+	margin-top: 1.5rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid var(--app-border-light);
+}
+
+.metrics-subsection-title {
+	margin: 0 0 1rem 0;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--app-gray-700);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+/* ====================================
+   GRID & CARDS
+   ==================================== */
+
+.metrics-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 1rem;
+}
+
+.metrics-card {
+	background: var(--app-gray-50);
+	border-radius: var(--app-radius-lg);
+	padding: 1.25rem;
+	border: 1px solid var(--app-border-light);
+	transition: all var(--app-transition-base);
+}
+
+.metrics-card:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--app-shadow-md);
+}
+
+.metrics-card-primary {
+	background: linear-gradient(135deg, var(--app-primary), var(--app-accent));
+	color: white;
+	border: none;
+}
+
+.metrics-card-primary .metrics-card-label,
+.metrics-card-primary .metrics-card-value {
+	color: white;
+}
+
+.metrics-card-success {
+	background: rgba(34, 197, 94, 0.1);
+	border-color: rgba(34, 197, 94, 0.2);
+}
+
+.metrics-card-success .metrics-card-label {
+	color: #16a34a;
+}
+
+.metrics-card-success .metrics-card-value {
+	color: #15803d;
+}
+
+.metrics-card-danger {
+	background: rgba(239, 68, 68, 0.1);
+	border-color: rgba(239, 68, 68, 0.2);
+}
+
+.metrics-card-danger .metrics-card-label {
+	color: #dc2626;
+}
+
+.metrics-card-danger .metrics-card-value {
+	color: #b91c1c;
+}
+
+.metrics-card-warning {
+	background: rgba(245, 158, 11, 0.1);
+	border-color: rgba(245, 158, 11, 0.2);
+}
+
+.metrics-card-warning .metrics-card-label {
+	color: #d97706;
+}
+
+.metrics-card-warning .metrics-card-value {
+	color: #b45309;
+}
+
+.metrics-card-info {
+	background: rgba(59, 130, 246, 0.1);
+	border-color: rgba(59, 130, 246, 0.2);
+}
+
+.metrics-card-info .metrics-card-label {
+	color: #2563eb;
+}
+
+.metrics-card-info .metrics-card-value {
+	color: #1e40af;
+}
+
+.metrics-card-label {
+	margin: 0 0 0.5rem 0;
+	font-size: 0.875rem;
+	color: var(--app-gray-600);
+	font-weight: 500;
+}
+
+.metrics-card-value {
+	margin: 0;
+	font-size: 1.75rem;
+	font-weight: 700;
+	color: var(--app-gray-900);
+	line-height: 1.2;
+}
+
+/* ====================================
+   LOCAL SELECTOR
+   ==================================== */
+
+.metrics-local-selector {
+	position: relative;
+}
+
+.metrics-local-selector-button {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	background: white;
+	border: 1px solid var(--app-border-light);
+	border-radius: var(--app-radius-md);
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	font-size: 0.875rem;
+	color: var(--app-gray-700);
+	font-weight: 500;
+}
+
+.metrics-local-selector-button:hover {
+	background: var(--app-gray-50);
+	border-color: var(--app-primary);
+}
+
+.metrics-local-selector-button svg:first-child {
+	color: var(--app-primary);
+}
+
+.metrics-local-selector-button svg:last-child {
+	color: var(--app-gray-500);
+	transition: transform 0.2s;
+}
+
+.metrics-local-dropdown {
+	position: absolute;
+	top: calc(100% + 0.5rem);
+	right: 0;
+	background: white;
+	border: 1px solid var(--app-border-light);
+	border-radius: var(--app-radius-md);
+	box-shadow: var(--app-shadow-lg);
+	z-index: 100;
+	min-width: 180px;
+	overflow: hidden;
+}
+
+.metrics-local-option {
+	width: 100%;
+	padding: 0.75rem 1rem;
+	background: white;
+	border: none;
+	text-align: left;
+	cursor: pointer;
+	transition: all var(--app-transition-base);
+	font-size: 0.875rem;
+	color: var(--app-gray-700);
+	font-weight: 500;
+}
+
+.metrics-local-option:hover {
+	background: var(--app-gray-50);
+}
+
+.metrics-local-option.active {
+	background: rgba(37, 99, 235, 0.1);
+	color: var(--app-primary);
+	font-weight: 600;
+}
+
+/* ====================================
+   LISTS
+   ==================================== */
+
+.metrics-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.metrics-list-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.75rem 1rem;
+	background: var(--app-gray-50);
+	border-radius: var(--app-radius-md);
+	border: 1px solid var(--app-border-light);
+}
+
+
+.metrics-list-item span:first-child {
+	font-size: 0.875rem;
+	color: var(--app-gray-700);
+	font-weight: 500;
+}
+
+.metrics-list-value {
+	font-size: 0.875rem;
+	color: var(--app-gray-900);
+	font-weight: 700;
+}
+
+/* ====================================
+   CHART
+   ==================================== */
+
+.metrics-chart-container {
+	width: 100%;
+}
+
+.metrics-chart-bars {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 0.5rem;
+	height: 250px;
+	margin-bottom: 1rem;
+	padding: 0 0.5rem;
+}
+
+.metrics-chart-bar-container {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	height: 100%;
+}
+
+.metrics-chart-bar-wrapper {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: flex-end;
+	position: relative;
+}
+
+.metrics-chart-bar {
+	width: 100%;
+	background: linear-gradient(180deg, var(--app-primary), var(--app-accent));
+	border-radius: var(--app-radius-md) var(--app-radius-md) 0 0;
+	position: relative;
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	padding-top: 0.5rem;
+	min-height: 2rem;
+	transition: all var(--app-transition-base);
+	cursor: pointer;
+}
+
+.metrics-chart-bar:hover {
+	opacity: 0.8;
+	transform: scaleY(1.05);
+}
+
+.metrics-chart-bar-value {
+	color: white;
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.metrics-chart-bar-completed {
+	width: 100%;
+	background: rgba(34, 197, 94, 0.7);
+	border-radius: var(--app-radius-md) var(--app-radius-md) 0 0;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	transition: all var(--app-transition-base);
+	pointer-events: none;
+}
+
+.metrics-chart-label {
+	margin: 0;
+	font-size: 0.75rem;
+	color: var(--app-gray-600);
+	font-weight: 500;
+	text-align: center;
+	white-space: nowrap;
+}
+
+.metrics-chart-legend {
+	display: flex;
+	justify-content: center;
+	gap: 1.5rem;
+	margin-top: 1rem;
+}
+
+.metrics-chart-legend-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.metrics-chart-legend-color {
+	width: 1rem;
+	height: 1rem;
+	border-radius: var(--app-radius-sm);
+}
+
+.metrics-chart-legend-total {
+	background: linear-gradient(135deg, var(--app-primary), var(--app-accent));
+}
+
+.metrics-chart-legend-completed {
+	background: rgba(34, 197, 94, 0.7);
+}
+
+.metrics-chart-legend-item span {
+	font-size: 0.875rem;
+	color: var(--app-gray-600);
+	font-weight: 500;
+}
+
+/* ====================================
+   EMPTY STATE
+   ==================================== */
+
+.metrics-empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	padding: 2rem;
+	color: var(--app-gray-500);
+	text-align: center;
+}
+
+.metrics-empty-state svg {
+	color: var(--app-gray-400);
+}
+
+.metrics-empty-state p {
+	margin: 0;
+	font-size: 0.875rem;
+}
+
+/* ====================================
+   RESPONSIVE
+   ==================================== */
+
+@media (max-width: 1024px) {
+	.metrics-grid {
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	}
+}
+
+@media (max-width: 768px) {
+	.metrics-panel-content {
+		padding: 1rem;
+		gap: 1.5rem;
+	}
+
+	.metrics-section {
+		padding: 1rem;
+	}
+
+	.metrics-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.metrics-card-value {
+		font-size: 1.5rem;
+	}
+}
+

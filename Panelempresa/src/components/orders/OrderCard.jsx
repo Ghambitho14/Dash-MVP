@@ -1,14 +1,12 @@
-import { MapPin, Clock, Trash2, User, Star, Bike, MessageCircle, Key } from 'lucide-react';
+import { MapPin, Clock, Trash2, User, Star, Bike, Key, MessageCircle } from 'lucide-react';
 import { formatStatusForCompany, formatRelativeTime, formatPrice, getInitials } from '../../utils/utils';
 import { useCurrentTime } from '../../hooks/orders/useCurrentTime';
-import { OrderChat } from './OrderChat';
-import { useState } from 'react';
-import { Modal } from '../ui/Modal';
+import { useOrderUnreadMessages } from '../../hooks/orders/useOrderUnreadMessages';
 import '../../styles/Components/OrderCard.css';
 
 export function OrderCard({ order, onClick, onDelete, showDriver = false, currentUser }) {
-	const [showChat, setShowChat] = useState(false);
 	const currentTime = useCurrentTime();
+	const hasUnreadMessages = useOrderUnreadMessages(order, currentUser);
 	const clientName = order.clientName || 'Cliente';
 	const clientPhone = order.clientPhone || '';
 
@@ -55,7 +53,15 @@ export function OrderCard({ order, onClick, onDelete, showDriver = false, curren
 					{getInitials(clientName)}
 				</div>
 				<div className="delivery-order-client-info">
-					<h4>{clientName}</h4>
+					<div className="delivery-order-client-name-row">
+						<h4>{clientName}</h4>
+						{hasUnreadMessages && order.driverId && (
+							<span className="delivery-order-unread-badge">
+								<MessageCircle size={14} />
+								<span>Tienes un mensaje del repartidor</span>
+							</span>
+						)}
+					</div>
 					{clientPhone && <p>{clientPhone}</p>}
 				</div>
 			</div>
@@ -132,23 +138,6 @@ export function OrderCard({ order, onClick, onDelete, showDriver = false, curren
 				</div>
 			</div>
 
-			{/* Botón de Chat - Solo si hay repartidor asignado */}
-			{order.driverId && currentUser && (
-				<div className="delivery-order-chat-button-container">
-					<button
-						className="delivery-order-chat-button"
-						onClick={(e) => {
-							e.stopPropagation();
-							setShowChat(true);
-						}}
-						title="Chat con repartidor"
-					>
-						<MessageCircle size={16} />
-						<span>Chat</span>
-					</button>
-				</div>
-			)}
-
 			{onDelete && (
 				<button
 					className="delivery-order-delete"
@@ -158,17 +147,6 @@ export function OrderCard({ order, onClick, onDelete, showDriver = false, curren
 				>
 					<Trash2 size={16} />
 				</button>
-			)}
-
-			{/* Modal de Chat */}
-			{showChat && order.driverId && currentUser && (
-				<Modal onClose={() => setShowChat(false)} maxWidth="md">
-					<OrderChat 
-						order={order} 
-						currentUser={currentUser}
-						onClose={() => setShowChat(false)}
-					/>
-				</Modal>
 			)}
 		</div>
 	);

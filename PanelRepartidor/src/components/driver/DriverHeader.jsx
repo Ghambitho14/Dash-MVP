@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Zap, LogOut, Bell } from 'lucide-react';
+import { Zap, LogOut, Bell, Headphones } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { logger } from '../../utils/logger';
 import '../../styles/Components/DriverHeader.css';
 
-export function DriverHeader({ isConnected, onToggleConnection, driverName, hasActiveOrders, onLogout }) {
+export function DriverHeader({ isConnected, onToggleConnection, driverName, hasActiveOrders, onLogout, onOpenSupportChat }) {
 	const handleToggleConnection = () => {
 		// Si intenta desconectarse y tiene pedidos activos, bloquear
 		if (isConnected && hasActiveOrders) {
@@ -54,6 +55,17 @@ export function DriverHeader({ isConnected, onToggleConnection, driverName, hasA
 								<span className="driver-header-status-text">Desconectado</span>
 							</div>
 						)}
+					</motion.button>
+
+					{/* Botón de Chat de Soporte */}
+					<motion.button
+						className="driver-header-logout-button"
+						whileTap={{ scale: 0.95 }}
+						title="Chat de Soporte"
+						style={{ background: '#3b82f6', borderColor: '#3b82f6' }}
+						onClick={() => onOpenSupportChat && onOpenSupportChat()}
+					>
+						<Headphones className="driver-header-logout-icon" style={{ color: 'white' }} />
 					</motion.button>
 
 					{/* Botón de notificaciones */}

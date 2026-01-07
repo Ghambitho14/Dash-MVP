@@ -10,7 +10,6 @@
 		"build:all": "npm run build && npm run build:admin",
 		"start": "node server.js",
 		"start:prod": "npm run build:all && node server.js",
-		"lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
 		"preview": "vite preview"
 	},
 	"dependencies": {

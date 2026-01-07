@@ -5,17 +5,23 @@ import { OrderList } from '../orders/OrderList';
 import { OrderDetail } from '../orders/OrderDetail';
 import { LocalSettings } from '../locals/LocalSettings';
 import { TrackingPanel } from '../tracking/TrackingPanel';
+import { MetricsPanel } from '../metrics/MetricsPanel';
 import { AccountSettings } from '../settings/AccountSettings';
 import { QuickActions } from '../ui/QuickActions';
 import { Modal } from '../ui/Modal';
+import { ChatHeaderButton } from '../orders/ChatHeaderButton';
 import { useCompanyPanel } from '../../hooks/panel/useCompanyPanel';
+import { useChatNotifications } from '../../hooks/orders/useChatNotifications';
 import { isAdminOrEmpresarial, getRoleName, getInitials } from '../../utils/utils';
-import { Package, Store, ChevronDown, Settings, Bell, LogOut, Search, Clock, Menu, X, Building2, Users, UserCog, Plus, Navigation, User, TrendingUp, TrendingDown } from 'lucide-react';
+import { Package, Store, ChevronDown, Settings, LogOut, Search, Clock, Menu, X, Building2, Users, UserCog, Plus, Navigation, User, BarChart3 } from 'lucide-react';
 import { logger } from '../../utils/logger';
 import '../../styles/Components/CompanyPanel.css';
 import '../../styles/Components/SettingsModal.css';
 
 export function CompanyPanel({ currentUser, orders, setOrders, onReloadOrders, localConfigs, setLocalConfigs, clients, onCreateClient, onUpdateClient, onDeleteClient, users, onCreateUser, onUpdateUser, onDeleteUser, onCreateOrder, onDeleteOrder, onSaveLocalConfigs, onLogout, onUpdateCurrentUser }) {
+	// Hook para notificaciones de chat
+	useChatNotifications(orders, currentUser);
+
 	const {
 		selectedOrder,
 		showCreateForm,
@@ -29,6 +35,7 @@ export function CompanyPanel({ currentUser, orders, setOrders, onReloadOrders, l
 		showLocalDropdown,
 		sidebarOpen,
 		showTrackingPanel,
+		showMetricsPanel,
 		userFilteredOrders,
 		filteredOrders,
 		locales,
@@ -44,6 +51,7 @@ export function CompanyPanel({ currentUser, orders, setOrders, onReloadOrders, l
 		setShowLocalDropdown,
 		setSidebarOpen,
 		setShowTrackingPanel,
+		setShowMetricsPanel,
 		handleCreateOrder,
 		handleDeleteOrder,
 		handleSaveLocalConfigs,
@@ -136,16 +144,8 @@ export function CompanyPanel({ currentUser, orders, setOrders, onReloadOrders, l
 						</div>
 					</div>
 					
-					<button 
-						className="delivery-header-button boton-encabezado-empresa boton-notificaciones" 
-						title="Notificaciones (Próximamente)"
-						disabled
-						onClick={() => {
-							logger.log('Notificaciones: feature en desarrollo');
-						}}
-					>
-						<Bell />
-					</button>
+					{/* Botón de Chat */}
+					<ChatHeaderButton orders={userFilteredOrders} currentUser={currentUser} />
 					
 					{isAdminOrEmpresarial(currentUser.role) && (
 						<button 
@@ -234,67 +234,20 @@ export function CompanyPanel({ currentUser, orders, setOrders, onReloadOrders, l
 						onShowUsers={() => setShowUserManagement(true)}
 						onShowSettings={() => setShowSettingsModal(true)}
 					/>
-					
-					{/* Estadísticas */}
-					<div className="delivery-stats-grid">
-						<div className="delivery-stat-card blue">
-							<div className="delivery-stat-header">
-								<span className="delivery-stat-label">Total de Pedidos</span>
-								<div className="delivery-stat-icon">
-									<Package />
-								</div>
-							</div>
-							<div className="delivery-stat-value">{userFilteredOrders.length}</div>
-							<div className="delivery-stat-change positive">
-								<TrendingUp size={14} />
-								<span>+12% desde ayer</span>
-							</div>
-						</div>
 
-						<div className="delivery-stat-card orange">
-							<div className="delivery-stat-header">
-								<span className="delivery-stat-label">Pendientes</span>
-								<div className="delivery-stat-icon">
-									<Clock />
-								</div>
-							</div>
-							<div className="delivery-stat-value">{userFilteredOrders.filter(o => o.status === 'Pendiente').length}</div>
-							<div className="delivery-stat-change negative">
-								<TrendingDown size={14} />
-								<span>-3% desde ayer</span>
-							</div>
-						</div>
-
-						<div className="delivery-stat-card blue">
-							<div className="delivery-stat-header">
-								<span className="delivery-stat-label">En Progreso</span>
-								<div className="delivery-stat-icon">
-									<Package />
-								</div>
-							</div>
-							<div className="delivery-stat-value">
-								{userFilteredOrders.filter(o => o.status !== 'Pendiente' && o.status !== 'Entregado').length}
-							</div>
-							<div className="delivery-stat-change positive">
-								<TrendingUp size={14} />
-								<span>+8% desde ayer</span>
-							</div>
-						</div>
-
-						<div className="delivery-stat-card green">
-							<div className="delivery-stat-header">
-								<span className="delivery-stat-label">Completados</span>
-								<div className="delivery-stat-icon">
-									<Package />
-								</div>
-							</div>
-							<div className="delivery-stat-value">{userFilteredOrders.filter(o => o.status === 'Entregado').length}</div>
-							<div className="delivery-stat-change positive">
-								<TrendingUp size={14} />
-								<span>+15% desde ayer</span>
-							</div>
-						</div>
-					</div>
+					{/* Botón Ir a Métricas */}
+					<button
+						className="delivery-metrics-button"
+						onClick={() => {
+							setShowMetricsPanel(true);
+							setShowTrackingPanel(false);
+							setActiveTab(null);
+						}}
+						title="Ver métricas y estadísticas"
+					>
+						<BarChart3 size={20} />
+						<span>Ir a métricas</span>
+					</button>
 				</aside>
 
 				{/* Main Content - Diseño Figma */}
@@ -302,9 +255,11 @@ export function CompanyPanel({ currentUser, orders, setOrders, onReloadOrders, l
 					{/* Header del Main */}
 					<div className="delivery-main-header">
 						<div className="delivery-main-title-row">
-							<h2 className="delivery-main-title">Panel de Pedidos</h2>
+							<h2 className="delivery-main-title">
+								{showMetricsPanel ? 'Métricas y Estadísticas' : 'Panel de Pedidos'}
+							</h2>
 							
-							{!showTrackingPanel && (
+							{!showTrackingPanel && !showMetricsPanel && (
 								<div className="delivery-search-bar">
 									<Search className="delivery-search-icon" />
 									<input
@@ -317,40 +272,57 @@ export function CompanyPanel({ currentUser, orders, setOrders, onReloadOrders, l
 						</div>
 
 						{/* Tabs */}
-						<div className="delivery-tabs">
-							<button
-								onClick={() => {
-									setActiveTab('active');
-									setShowTrackingPanel(false);
-								}}
-								className={`delivery-tab ${activeTab === 'active' && !showTrackingPanel ? 'active' : ''}`}
-							>
-								Activos ({userFilteredOrders.filter(o => o.status !== 'Entregado').length})
-							</button>
-							<button
-								onClick={() => {
-									setActiveTab('completed');
-									setShowTrackingPanel(false);
-								}}
-								className={`delivery-tab ${activeTab === 'completed' && !showTrackingPanel ? 'active' : ''}`}
-							>
-								Completados ({userFilteredOrders.filter(o => o.status === 'Entregado').length})
-							</button>
-							<button
-								onClick={() => {
-									setShowTrackingPanel(true);
-									setActiveTab(null);
-								}}
-								className={`delivery-tab ${showTrackingPanel ? 'active' : ''}`}
-							>
-								<Navigation style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
-								Trackeo
-							</button>
-						</div>
+						{!showMetricsPanel && (
+							<div className="delivery-tabs">
+								<button
+									onClick={() => {
+										setActiveTab('active');
+										setShowTrackingPanel(false);
+										setShowMetricsPanel(false);
+									}}
+									className={`delivery-tab ${activeTab === 'active' && !showTrackingPanel && !showMetricsPanel ? 'active' : ''}`}
+								>
+									Activos ({userFilteredOrders.filter(o => o.status !== 'Entregado').length})
+								</button>
+								<button
+									onClick={() => {
+										setActiveTab('completed');
+										setShowTrackingPanel(false);
+										setShowMetricsPanel(false);
+									}}
+									className={`delivery-tab ${activeTab === 'completed' && !showTrackingPanel && !showMetricsPanel ? 'active' : ''}`}
+								>
+									Completados ({userFilteredOrders.filter(o => o.status === 'Entregado').length})
+								</button>
+								<button
+									onClick={() => {
+										setShowTrackingPanel(true);
+										setShowMetricsPanel(false);
+										setActiveTab(null);
+									}}
+									className={`delivery-tab ${showTrackingPanel ? 'active' : ''}`}
+								>
+									<Navigation style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
+									Trackeo
+								</button>
+							</div>
+						)}
 					</div>
 
-					{/* Orders List o Panel de Trackeo */}
-					{showTrackingPanel ? (
+					{/* Orders List, Panel de Trackeo o Panel de Métricas */}
+					{showMetricsPanel ? (
+						<div className="delivery-orders-container">
+							<MetricsPanel 
+								orders={userFilteredOrders}
+								currentUser={currentUser}
+								localConfigs={localConfigs}
+								onClose={() => {
+									setShowMetricsPanel(false);
+									setActiveTab('active');
+								}}
+							/>
+						</div>
+					) : showTrackingPanel ? (
 						<div className="delivery-orders-container">
 							<TrackingPanel 
 								orders={userFilteredOrders.filter(order => order.status !== 'Entregado')}
@@ -521,6 +493,7 @@ export function CompanyPanel({ currentUser, orders, setOrders, onReloadOrders, l
 					/>
 				</Modal>
 			)}
+
 
 		</div>
 	);

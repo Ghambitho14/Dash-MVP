@@ -17,6 +17,7 @@ export function useCompanyPanel(currentUser, orders, setOrders, localConfigs, se
 	const [showLocalDropdown, setShowLocalDropdown] = useState(false);
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [showTrackingPanel, setShowTrackingPanel] = useState(false);
+	const [showMetricsPanel, setShowMetricsPanel] = useState(false);
 
 	useEffect(() => {
 		// Si es usuario local, establecer automáticamente su local
@@ -98,6 +99,7 @@ export function useCompanyPanel(currentUser, orders, setOrders, localConfigs, se
 		showLocalDropdown,
 		sidebarOpen,
 		showTrackingPanel,
+		showMetricsPanel,
 		// Datos calculados
 		userFilteredOrders,
 		filteredOrders,
@@ -115,6 +117,7 @@ export function useCompanyPanel(currentUser, orders, setOrders, localConfigs, se
 		setShowLocalDropdown,
 		setSidebarOpen,
 		setShowTrackingPanel,
+		setShowMetricsPanel,
 		handleCreateOrder,
 		handleDeleteOrder,
 		handleSaveLocalConfigs,

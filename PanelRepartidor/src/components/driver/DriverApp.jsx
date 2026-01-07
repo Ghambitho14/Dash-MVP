@@ -10,10 +10,13 @@ import { MyOrdersView } from './MyOrdersView';
 import { BottomNavigation } from './BottomNavigation';
 import { DriverHeader } from './DriverHeader';
 import { Modal } from '../common/Modal';
+import { ChatButton } from '../orders/ChatButton';
+import { SupportChat } from '../support/SupportChat';
+import { useChatNotifications } from '../../hooks/useChatNotifications';
 import { getOrCreateOrderChat } from '../../services/orderChatService';
 import { supabase } from '../../utils/supabase';
 import { getStorageObject } from '../../utils/storage';
-import { Package, MapPin, CheckCircle } from 'lucide-react';
+import { Package, MapPin, CheckCircle, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { logger } from '../../utils/logger';
 import '../../styles/Components/DriverApp.css';
@@ -36,6 +39,7 @@ export function DriverApp({
 	const [activeTab, setActiveTab] = useState('available');
 	const [driverData, setDriverData] = useState(null);
 	const [showOrdersModal, setShowOrdersModal] = useState(false);
+	const [showSupportChat, setShowSupportChat] = useState(false);
 
 	// Cargar información del driver desde storage (async)
 	useEffect(() => {
@@ -69,6 +73,9 @@ export function DriverApp({
 
 	const driverId = driverData?.id;
 	const finalDriverName = driverName || driverData?.name || 'Repartidor';
+
+	// Hook para notificaciones de chat
+	useChatNotifications(orders, currentDriver);
 
 	// ---- Listas derivadas ----
 	const availableOrders = orders.filter(order => order.status === 'Pendiente');
@@ -412,6 +419,7 @@ export function DriverApp({
 				driverName={finalDriverName}
 				hasActiveOrders={myOrders.length > 0}
 				onLogout={onLogout}
+				onOpenSupportChat={() => setShowSupportChat(true)}
 			/>
 
 			{/* Contenido principal */}
@@ -585,6 +593,15 @@ export function DriverApp({
 				)}
 			</AnimatePresence>
 
+			{/* Modal de chat de soporte */}
+			{showSupportChat && currentDriver && (
+				<Modal onClose={() => setShowSupportChat(false)} maxWidth="md">
+					<SupportChat
+						currentDriver={currentDriver}
+						onClose={() => setShowSupportChat(false)}
+					/>
+				</Modal>
+			)}
 		</div>
 	);
 }

@@ -14,6 +14,7 @@ import {
 import { useDriverLocations } from '../hooks/useDriverLocations';
 import { useToast } from '../hooks/useToast';
 import { AdminTrackingMap } from './AdminTrackingMap';
+import { SupportChatButton } from './SupportChatButton';
 import '../style/Dashboard.css';
 
 export function Dashboard({ admin, onLogout }) {
@@ -550,6 +551,9 @@ export function Dashboard({ admin, onLogout }) {
 					<p>Bienvenido, {admin.name}</p>
 				</div>
 				<div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+					{/* Botón de Chat de Soporte */}
+					<SupportChatButton admin={admin} />
+					
 					<button 
 						className="admin-logout-button admin-notification-button"
 						style={{ background: '#f59e0b' }}

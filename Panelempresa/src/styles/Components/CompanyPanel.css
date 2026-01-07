@@ -737,140 +737,45 @@
 
 
 /* ====================================
-   ESTADÍSTICAS - DISEÑO FIGMA
+   BOTÓN IR A MÉTRICAS
    ==================================== */
-.estadisticas-barra-lateral-empresa,
-.delivery-stats-grid {
-	display: grid;
-	grid-template-columns: 1fr;
-	gap: 0.875rem;
-}
-
-.tarjeta-estadistica-lateral,
-.delivery-stat-card {
-	background: white;
-	border-radius: var(--app-radius-xl);
-	padding: 1.25rem;
-	box-shadow: var(--app-shadow-sm);
-	border: 1px solid var(--app-border-light);
-	position: relative;
-	overflow: hidden;
-	transition: all var(--app-transition-base);
-	cursor: pointer;
-}
-
-.tarjeta-estadistica-lateral::before,
-.delivery-stat-card::before {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 4px;
-	height: 100%;
-	background: currentColor;
-	opacity: 1;
-}
-
-.tarjeta-estadistica-lateral:hover,
-.delivery-stat-card:hover {
-	transform: translateY(-2px);
-	box-shadow: var(--app-shadow-md);
-}
-
-.tarjeta-estadistica-lateral-azul,
-.delivery-stat-card.blue { color: var(--app-primary); }
-
-.tarjeta-estadistica-lateral-naranja,
-.delivery-stat-card.orange { color: var(--app-warning); }
-
-.tarjeta-estadistica-lateral-verde,
-.delivery-stat-card.green { color: var(--app-success); }
-
-.delivery-stat-card.purple { color: var(--app-accent); }
-
-.delivery-stat-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 0.75rem;
-}
-
-.delivery-stat-label {
-	color: var(--app-gray-600);
-	font-size: 0.8125rem;
-	font-weight: 600;
-	letter-spacing: 0.01em;
-}
-
-.icono-estadistica-principal,
-.delivery-stat-icon {
-	width: 2.25rem;
-	height: 2.25rem;
-	background: currentColor;
-	opacity: 0.1;
-	border-radius: var(--app-radius);
+.delivery-metrics-button {
+	width: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	gap: 0.75rem;
+	padding: 1rem 1.25rem;
+	background: linear-gradient(135deg, var(--app-primary), var(--app-accent));
+	color: white;
+	border: none;
+	border-radius: var(--app-radius-lg);
+	font-size: 0.9375rem;
+	font-weight: 700;
+	cursor: pointer;
 	transition: all var(--app-transition-base);
+	box-shadow: var(--app-shadow-sm);
+	margin-top: 0.5rem;
 }
 
-.delivery-stat-card:hover .delivery-stat-icon {
-	opacity: 0.15;
-	transform: scale(1.05);
+.delivery-metrics-button:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--app-shadow-md);
+	background: linear-gradient(135deg, #2563eb, #7c3aed);
 }
 
-.icono-estadistica-principal svg,
-.delivery-stat-icon svg {
+.delivery-metrics-button:active {
+	transform: translateY(0);
+}
+
+.delivery-metrics-button svg {
 	width: 1.25rem;
 	height: 1.25rem;
-	color: currentColor;
-	opacity: 1;
+	flex-shrink: 0;
 }
 
-.etiqueta-estadistica-principal,
-.delivery-stat-label {
-	margin: 0;
-}
-
-.valor-estadistica-principal,
-.delivery-stat-value {
-	color: var(--app-gray-900);
-	font-size: 2rem;
-	font-weight: 800;
-	line-height: 1;
-	letter-spacing: -0.03em;
-}
-
-.cambio-estadistica-empresa,
-.delivery-stat-change {
-	display: flex;
-	align-items: center;
-	gap: 0.25rem;
-	margin-top: 0.5rem;
-	font-size: 0.75rem;
-	font-weight: 600;
-	padding: 0.25rem 0.5rem;
-	border-radius: var(--app-radius-sm);
-	width: fit-content;
-}
-
-.cambio-estadistica-empresa-positivo,
-.delivery-stat-change.positive {
-	color: var(--app-success);
-	background: rgba(5, 150, 105, 0.1);
-}
-
-.cambio-estadistica-empresa-negativo,
-.delivery-stat-change.negative {
-	color: var(--app-error);
-	background: rgba(220, 38, 38, 0.1);
-}
-
-.cambio-estadistica-empresa svg,
-.delivery-stat-change svg {
-	width: 0.875rem;
-	height: 0.875rem;
+.delivery-metrics-button span {
+	white-space: nowrap;
 }
 
 /* ====================================
@@ -1208,8 +1113,7 @@
 		width: 260px;
 	}
 
-	.delivery-actions-card,
-	.delivery-stat-card {
+	.delivery-actions-card {
 		padding: 1.25rem;
 	}
 
@@ -1316,12 +1220,6 @@
 	.delivery-actions-card {
 		flex: 0 0 auto;
 		width: 280px;
-	}
-
-	.delivery-stats-grid {
-		display: flex;
-		gap: 0.75rem;
-		width: auto;
 	}
 
 	.delivery-stat-card {
@@ -1468,49 +1366,6 @@
 		flex-shrink: 0;
 	}
 	
-	.delivery-stats-grid {
-		grid-template-columns: repeat(2, 1fr);
-		gap: 0.875rem;
-	}
-	
-	.delivery-stat-card {
-		padding: 1.125rem;
-		border-radius: 0.875rem;
-	}
-	
-	.delivery-stat-header {
-		margin-bottom: 0.625rem;
-	}
-	
-	.delivery-stat-icon {
-		width: 2.25rem;
-		height: 2.25rem;
-	}
-	
-	.delivery-stat-value {
-		font-size: 1.625rem;
-	}
-	
-	.delivery-stat-label {
-		font-size: 0.8125rem;
-	}
-	
-	.delivery-stat-change {
-		margin-top: 0.375rem;
-		font-size: 0.6875rem;
-		padding: 0.25rem 0.5rem;
-		border-radius: 0.375rem;
-		background: rgba(0, 0, 0, 0.02);
-	}
-	
-	.delivery-stat-change.positive {
-		background: rgba(16, 185, 129, 0.1);
-	}
-	
-	.delivery-stat-change.negative {
-		background: rgba(239, 68, 68, 0.1);
-	}
-	
 	.superposicion-empresa {
 		display: block;
 		z-index: 150;
@@ -1588,15 +1443,6 @@
 
 	.delivery-action-text {
 		font-size: 0.75rem;
-	}
-
-	.delivery-stat-card {
-		width: 180px;
-		padding: 1rem;
-	}
-
-	.delivery-stat-value {
-		font-size: 1.75rem;
 	}
 
 	.delivery-main-header {
