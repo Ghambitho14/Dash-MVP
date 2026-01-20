@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import {
 	getSupportChatMessages,
 	sendSupportChatMessage as sendMessageService,
+	uploadSupportChatImage,
 	markSupportChatMessagesAsRead,
 } from '../services/supportChatService';
 import { supabase } from '../utils/supabase';
@@ -73,10 +74,11 @@ export function useSupportChat(chat, admin) {
 	}, [chat?.id, admin]);
 
 	// Enviar mensaje
-	const sendMessage = useCallback(async (messageText) => {
-		if (!chat || !messageText.trim() || !admin) return;
+	const sendMessage = useCallback(async (messageText, imageFile = null) => {
+		if (!chat || !admin) return;
+		if (!messageText?.trim() && !imageFile) return;
 
-		const messageTextTrimmed = messageText.trim();
+		const messageTextTrimmed = messageText?.trim() || '';
 		const senderId = admin.id;
 		const senderType = 'superadmin';
 
@@ -87,6 +89,7 @@ export function useSupportChat(chat, admin) {
 			sender_id: senderId,
 			sender_type: senderType,
 			message: messageTextTrimmed,
+			image_url: imageFile ? URL.createObjectURL(imageFile) : null,
 			created_at: new Date().toISOString(),
 			read_at: null,
 			_isTemporary: true,
@@ -97,11 +100,24 @@ export function useSupportChat(chat, admin) {
 		setSending(true);
 
 		try {
+			let imageUrl = null;
+
+			// Subir imagen si existe
+			if (imageFile) {
+				imageUrl = await uploadSupportChatImage(imageFile, chat.id, senderId);
+			}
+
 			const newMessage = await sendMessageService(
 				chat.id,
 				senderId,
-				messageTextTrimmed
+				messageTextTrimmed,
+				imageUrl
 			);
+			
+			// Limpiar URL temporal si se creó
+			if (tempMessage.image_url && tempMessage.image_url.startsWith('blob:')) {
+				URL.revokeObjectURL(tempMessage.image_url);
+			}
 			
 			// Reemplazar mensaje temporal con el real
 			setMessages(prev => {
@@ -115,6 +131,11 @@ export function useSupportChat(chat, admin) {
 			
 			setTimeout(() => scrollToBottom(), 100);
 		} catch (err) {
+			// Limpiar URL temporal si se creó
+			if (tempMessage.image_url && tempMessage.image_url.startsWith('blob:')) {
+				URL.revokeObjectURL(tempMessage.image_url);
+			}
+			
 			// Revertir optimistic update
 			setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
 			console.error('❌ Error enviando mensaje de soporte:', err);

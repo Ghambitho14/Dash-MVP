@@ -1,47 +1,22 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { geocodeAddress } from '../../utils/utils';
-import { ensureGoogleMapsLoaded } from '../../utils/googleMapsLoader';
 import { logger } from '../../utils/logger';
 import '../../styles/Components/SimpleMap.css';
 
+// Fix para iconos de Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+	iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+	iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+	shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+});
+
 export function SimpleMap({ address, label }) {
 	const [coords, setCoords] = useState(null);
-	const [mapLoaded, setMapLoaded] = useState(false);
 	const [loading, setLoading] = useState(true);
-	const mapRef = useRef(null);
-	const mapInstanceRef = useRef(null);
-	const markerRef = useRef(null);
-
-	const apiKey = import.meta.env.VITE_API_KEY_MAPS;
-
-	// Cargar script de Google Maps
-	useEffect(() => {
-		if (!apiKey) {
-			logger.error('❌ VITE_API_KEY_MAPS no está configurada en .env');
-			setLoading(false);
-			return;
-		}
-
-		let cancelled = false;
-
-		ensureGoogleMapsLoaded({ apiKey, libraries: ['places'] })
-			.then(() => {
-				if (!cancelled) {
-					setMapLoaded(true);
-					logger.log('✅ Google Maps cargado en SimpleMap');
-				}
-			})
-			.catch((error) => {
-				if (!cancelled) {
-					logger.error('❌ Error cargando Google Maps API:', error);
-					setLoading(false);
-				}
-			});
-
-		return () => {
-			cancelled = true;
-		};
-	}, [apiKey]);
 
 	// Geocodificar dirección
 	useEffect(() => {
@@ -60,58 +35,16 @@ export function SimpleMap({ address, label }) {
 		loadAddress();
 	}, [address]);
 
-	// Inicializar mapa cuando esté listo
-	useEffect(() => {
-		if (!mapLoaded || !window.google || !mapRef.current || !coords) {
-			return;
-		}
+	// Crear icono personalizado
+	const createIcon = () => L.divIcon({
+		className: 'custom-marker simple-marker',
+		html: '<div style="background: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+		iconSize: [16, 16],
+		iconAnchor: [8, 8],
+	});
 
-		const timeoutId = setTimeout(() => {
-			const google = window.google;
-
-			// Crear mapa
-			const map = new google.maps.Map(mapRef.current, {
-				zoom: 15,
-				center: { lat: coords.lat, lng: coords.lon },
-				mapTypeControl: false,
-				fullscreenControl: true,
-				streetViewControl: false,
-				styles: [
-					{
-						featureType: 'poi',
-						elementType: 'labels',
-						stylers: [{ visibility: 'off' }]
-					}
-				]
-			});
-
-			mapInstanceRef.current = map;
-
-			// Limpiar marcador anterior
-			if (markerRef.current) {
-				markerRef.current.setMap(null);
-			}
-
-			// Crear marcador
-			markerRef.current = new google.maps.Marker({
-				position: { lat: coords.lat, lng: coords.lon },
-				map: map,
-				icon: {
-					path: google.maps.SymbolPath.CIRCLE,
-					scale: 8,
-					fillColor: '#3b82f6',
-					fillOpacity: 1,
-					strokeColor: '#ffffff',
-					strokeWeight: 2,
-				},
-				title: label || address,
-			});
-
-			setLoading(false);
-		}, 100);
-
-		return () => clearTimeout(timeoutId);
-	}, [mapLoaded, coords, address, label]);
+	const defaultCenter = [-33.4489, -70.6693];
+	const center = coords ? [coords.lat, coords.lon] : defaultCenter;
 
 	if (loading) {
 		return (
@@ -138,8 +71,23 @@ export function SimpleMap({ address, label }) {
 	return (
 		<div className="simple-map-container">
 			{label && <p className="simple-map-label">{label}</p>}
-			<div className="simple-map" ref={mapRef} />
+			<MapContainer
+				center={center}
+				zoom={15}
+				style={{ height: '200px', width: '100%', zIndex: 0 }}
+				scrollWheelZoom={true}
+				className="simple-map"
+			>
+				<TileLayer
+					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+					url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+				/>
+				<Marker position={[coords.lat, coords.lon]} icon={createIcon()}>
+					<Popup>
+						{label || address}
+					</Popup>
+				</Marker>
+			</MapContainer>
 		</div>
 	);
 }
-

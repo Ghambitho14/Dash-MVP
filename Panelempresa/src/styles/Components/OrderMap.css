@@ -101,19 +101,20 @@
 	height: 1rem;
 }
 
-/* Mapa */
-.order-map-google {
+/* Mapa con Leaflet */
+.order-map-container .leaflet-container {
 	width: 100%;
 	height: 400px;
 	border-radius: 0;
 	position: relative;
 	z-index: 0;
+	font-family: inherit;
 }
 
-/* Eliminar estilos inline del div interno que Google Maps crea */
-.order-map-google > div {
-	height: 100% !important;
-	width: 100% !important;
+/* Estilos para marcadores personalizados */
+.custom-marker {
+	background: transparent !important;
+	border: none !important;
 }
 
 /* Marcadores personalizados */

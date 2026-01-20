@@ -16,6 +16,7 @@ export function useCreateOrderForm(currentUser, localConfigs, clients) {
 	const [formData, setFormData] = useState({
 		clientName: '',
 		selectedClientId: '',
+		clientPhone: '',
 		pickupAddress: initialAddress,
 		deliveryAddress: '',
 		local: initialLocal,
@@ -46,6 +47,7 @@ export function useCreateOrderForm(currentUser, localConfigs, clients) {
 			...prev,
 			selectedClientId: client.id,
 			clientName: client.name,
+			clientPhone: '', // Limpiar teléfono cuando se selecciona un cliente registrado
 			deliveryAddress: client.address,
 		}));
 		setShowClientDropdown(false);
@@ -57,6 +59,7 @@ export function useCreateOrderForm(currentUser, localConfigs, clients) {
 			...prev,
 			clientName: value,
 			selectedClientId: '',
+			// No limpiar teléfono al escribir, solo cuando se selecciona un cliente
 			deliveryAddress: prev.selectedClientId ? '' : prev.deliveryAddress,
 		}));
 		setShowClientDropdown(value.trim().length > 0);
@@ -101,6 +104,7 @@ export function useCreateOrderForm(currentUser, localConfigs, clients) {
 		return {
 			clientName: formData.clientName,
 			selectedClientId: formData.selectedClientId,
+			clientPhone: formData.selectedClientId ? undefined : formData.clientPhone, // Solo incluir si no hay cliente seleccionado
 			pickupAddress: formData.pickupAddress,
 			deliveryAddress: formData.deliveryAddress,
 			local: formData.local,
@@ -109,10 +113,12 @@ export function useCreateOrderForm(currentUser, localConfigs, clients) {
 		};
 	};
 
+	// Validar: si no hay cliente seleccionado, el teléfono es requerido
 	const isValid = formData.pickupAddress.trim() !== '' 
 		&& formData.deliveryAddress.trim() !== '' 
 		&& formData.suggestedPrice !== '' 
-		&& parseFloat(formData.suggestedPrice) > 0;
+		&& parseFloat(formData.suggestedPrice) > 0
+		&& (formData.selectedClientId || formData.clientPhone.trim() !== ''); // Teléfono requerido si no hay cliente seleccionado
 
 	const getGridClass = () => {
 		if (availableLocales.length <= 3) return 'formulario-crear-pedido-local-grid-3';

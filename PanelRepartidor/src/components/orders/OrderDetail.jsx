@@ -8,7 +8,7 @@ import '../../styles/Components/OrderDetail.css';
 import { getPrimaryAction, validateOrderForTransition } from './orderStateMachine.jsx';
 
 
-export function OrderDetail({ order, onClose, onAcceptOrder, onUpdateStatus }) {
+export function OrderDetail({ order, onClose, onAcceptOrder, onUpdateStatus, canAcceptOrder = true }) {
 	const StatusIcon = getStatusIcon(order.status);
 	const action = getPrimaryAction(order);
 	const isAssigned = order.status === 'Asignado';
@@ -36,6 +36,10 @@ export function OrderDetail({ order, onClose, onAcceptOrder, onUpdateStatus }) {
 	}, [order.status, order.updatedAt]);
 
 	const handleAccept = () => {
+		if (!canAcceptOrder) {
+			toast.error('No puedes aceptar más pedidos. Tienes 2 o más pedidos activos. Completa algunos antes de aceptar nuevos.');
+			return;
+		}
 		if (onAcceptOrder) {
 			onAcceptOrder(order.id);
 		}
@@ -202,9 +206,11 @@ export function OrderDetail({ order, onClose, onAcceptOrder, onUpdateStatus }) {
 						</button>
 						<button
 							onClick={handleAccept}
-							className="order-detail-driver-button order-detail-driver-button-primary"
+							disabled={!canAcceptOrder}
+							className={`order-detail-driver-button order-detail-driver-button-primary ${!canAcceptOrder ? 'order-detail-driver-button-disabled' : ''}`}
+							title={!canAcceptOrder ? 'No puedes aceptar más pedidos. Tienes 2 o más pedidos activos.' : ''}
 						>
-							Aceptar Pedido
+							{canAcceptOrder ? 'Aceptar Pedido' : 'Límite alcanzado (2+ pedidos activos)'}
 						</button>
 					</>
 				)}

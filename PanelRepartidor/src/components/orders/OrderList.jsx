@@ -2,7 +2,7 @@ import { OrderCard } from './OrderCard';
 import { useCurrentTime } from '../../hooks/useCurrentTime';
 import '../../styles/Components/OrderList.css';
 
-export function OrderList({ orders, onAcceptOrder, onUpdateStatus }) {
+export function OrderList({ orders, onAcceptOrder, onUpdateStatus, myOrdersCount = 0 }) {
 	const currentTime = useCurrentTime();
 	
 	if (orders.length === 0) {
@@ -22,6 +22,7 @@ export function OrderList({ orders, onAcceptOrder, onUpdateStatus }) {
 					onAcceptOrder={onAcceptOrder}
 					onUpdateStatus={onUpdateStatus}
 					currentTime={currentTime}
+					canAcceptOrder={myOrdersCount < 2}
 				/>
 			))}
 		</div>

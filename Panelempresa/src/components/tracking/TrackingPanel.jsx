@@ -1,33 +1,48 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { getOrderDriverLocation, subscribeToDriverLocation } from '../../services/locationService';
 import { geocodeAddress } from '../../utils/utils';
+import { getRoute } from '../../services/routingService';
 import { logger } from '../../utils/logger';
-import { setupGoogleMapsErrorListener, getGoogleMapsErrorMessage } from '../../utils/googleMapsErrors';
 import { MapPin, Package, Navigation, AlertCircle, Bike, Clock, X } from 'lucide-react';
 import '../../styles/Components/TrackingPanel.css';
 
+// Fix para iconos de Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+	iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+	iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+	shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+});
+
+// Componente para ajustar bounds del mapa
+function MapBounds({ bounds }) {
+	const map = useMap();
+	
+	useEffect(() => {
+		if (bounds && bounds.length > 0) {
+			map.fitBounds(bounds, { padding: [50, 50] });
+		}
+	}, [map, bounds]);
+	
+	return null;
+}
+
 export function TrackingPanel({ orders, onSelectOrder }) {
-	const [mapLoaded, setMapLoaded] = useState(false);
-	const [loading, setLoading] = useState(false); // Cambiado a false - solo se activa durante geocodificación
-	const [error, setError] = useState(null);
+	const [loading, setLoading] = useState(false);
 	const [selectedDriver, setSelectedDriver] = useState(null);
-	const [selectedOrderId, setSelectedOrderId] = useState(null); // Pedido seleccionado para mostrar su ruta
-	const [driverLocations, setDriverLocations] = useState(new Map()); // driverId -> location
+	const [selectedOrderId, setSelectedOrderId] = useState(null);
+	const [driverLocations, setDriverLocations] = useState(new Map());
 	const [sidebarOpen, setSidebarOpen] = useState(true);
-	const [hasCoordinates, setHasCoordinates] = useState(false); // Para rastrear si hay coordenadas disponibles
-		const mapRef = useRef(null);
-		const mapInstanceRef = useRef(null);
-		const markersRef = useRef([]);
-		const subscriptionsRef = useRef([]);
-		const orderCoordsRef = useRef(new Map()); // Cache de coordenadas por pedido (order.id -> {pickup, delivery})
-		const addressCacheRef = useRef(new Map()); // Cache de direcciones geocodificadas (address -> {lat, lon})
-		const driverMarkersRef = useRef(new Map()); // driverId -> marker
-		const directionsServiceRef = useRef(null); // Servicio de direcciones de Google Maps
-		const directionsRendererRef = useRef(null); // UN SOLO DirectionsRenderer reutilizable
+	const [hasCoordinates, setHasCoordinates] = useState(false);
+	const orderCoordsRef = useRef(new Map());
+	const addressCacheRef = useRef(new Map());
+	const subscriptionsRef = useRef([]);
+	const routeGeometryRef = useRef(null);
 
-	const apiKey = import.meta.env.VITE_API_KEY_MAPS;
-
-	// Filtrar solo pedidos activos (no entregados)
+	// Filtrar solo pedidos activos
 	const activeOrders = orders.filter(order => order.status !== 'Entregado');
 
 	// Agrupar pedidos por repartidor
@@ -38,7 +53,6 @@ export function TrackingPanel({ orders, onSelectOrder }) {
 			if (order.driverId && order.driverName && order.status !== 'Pendiente') {
 				const driverLocation = driverLocations.get(order.driverId);
 				
-				// Solo incluir repartidores que tienen ubicación válida
 				if (driverLocation && driverLocation.latitude && driverLocation.longitude) {
 					if (!driversMap.has(order.driverId)) {
 						driversMap.set(order.driverId, {
@@ -56,61 +70,9 @@ export function TrackingPanel({ orders, onSelectOrder }) {
 		return Array.from(driversMap.values());
 	}, [activeOrders, driverLocations]);
 
-	// Cargar script de Google Maps
-	useEffect(() => {
-		if (!apiKey) {
-			setError('API Key de Google Maps no configurada');
-			setLoading(false);
-			return;
-		}
-
-		// Verificar si ya está cargado
-		if (window.google && window.google.maps) {
-			setMapLoaded(true);
-			return;
-		}
-
-		// Verificar si el script ya existe
-		const existingScript = document.querySelector(`script[src*="maps.googleapis.com"]`);
-		if (existingScript) {
-			existingScript.addEventListener('load', () => {
-				setMapLoaded(true);
-			});
-			if (window.google && window.google.maps) {
-				setMapLoaded(true);
-			}
-			return;
-		}
-
-		// Cargar script de Google Maps con loading=async (incluir directions para rutas)
-		const script = document.createElement('script');
-		script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,directions&loading=async`;
-		script.async = true;
-		script.defer = true;
-		script.onload = () => {
-			setMapLoaded(true);
-		};
-		script.onerror = (error) => {
-			const errorMessage = getGoogleMapsErrorMessage('ApiProjectMapError') || 
-				'Error cargando Google Maps API. Verifica tu clave de API y las restricciones.';
-			setError(errorMessage);
-			setLoading(false);
-			logger.error('Error cargando Google Maps API:', error);
-		};
-		document.head.appendChild(script);
-		
-		// Configurar listener para errores de Google Maps
-		const cleanup = setupGoogleMapsErrorListener((errorMsg) => {
-			setError(errorMsg);
-			setLoading(false);
-		});
-		
-		return cleanup;
-	}, [apiKey]);
-
 	// Geocodificar direcciones de pedidos
 	useEffect(() => {
-		if (!mapLoaded || activeOrders.length === 0) {
+		if (activeOrders.length === 0) {
 			setLoading(false);
 			return;
 		}
@@ -118,327 +80,82 @@ export function TrackingPanel({ orders, onSelectOrder }) {
 		const geocodeOrders = async () => {
 			setLoading(true);
 			const coordsMap = new Map();
+			const timeoutId = setTimeout(() => {
+				logger.warn('Geocoding timeout, mostrando mapa con coordenadas disponibles');
+				setLoading(false);
+			}, 30000); // Timeout de 30 segundos
 
-			// Geocodificar direcciones con un pequeño delay entre cada una para evitar rate limiting
-			for (const order of activeOrders) {
-				const orderId = order.id;
-				const pickupAddress = order.pickupAddress || order.localAddress;
-				const deliveryAddress = order.deliveryAddress;
+			try {
+				for (const order of activeOrders) {
+					const orderId = order.id;
+					const pickupAddress = order.pickupAddress || order.localAddress;
+					const deliveryAddress = order.deliveryAddress;
 
-				logger.log(`📍 Procesando pedido ${orderId}:`, {
-					hasPickupAddress: !!pickupAddress,
-					hasDeliveryAddress: !!deliveryAddress,
-					pickupAddress: pickupAddress,
-					deliveryAddress: deliveryAddress
-				});
+					const coords = {
+						pickup: null,
+						delivery: null,
+					};
 
-				const coords = {
-					pickup: null,
-					delivery: null,
-				};
-
-				if (pickupAddress) {
-					// Verificar cache de direcciones
-					if (addressCacheRef.current.has(pickupAddress)) {
-						coords.pickup = addressCacheRef.current.get(pickupAddress);
-						logger.log(`📍 Usando coordenadas de pickup desde cache para ${orderId}`);
-					} else {
-						logger.log(`📍 Geocodificando dirección de pickup para ${orderId}:`, pickupAddress);
-						const pickupCoords = await geocodeAddress(pickupAddress);
-						if (pickupCoords) {
-							coords.pickup = pickupCoords;
-							addressCacheRef.current.set(pickupAddress, pickupCoords);
-							logger.log(`✅ Coordenadas de pickup obtenidas para ${orderId}:`, pickupCoords);
+					if (pickupAddress) {
+						if (addressCacheRef.current.has(pickupAddress)) {
+							coords.pickup = addressCacheRef.current.get(pickupAddress);
 						} else {
-							logger.warn(`⚠️ No se pudieron obtener coordenadas de pickup para ${orderId}:`, pickupAddress);
+							try {
+								const pickupCoords = await geocodeAddress(pickupAddress);
+								if (pickupCoords) {
+									coords.pickup = pickupCoords;
+									addressCacheRef.current.set(pickupAddress, pickupCoords);
+								}
+							} catch (err) {
+								logger.error('Error geocodificando pickup:', err);
+							}
 						}
 					}
-				}
 
-				if (deliveryAddress) {
-					// Verificar cache de direcciones
-					if (addressCacheRef.current.has(deliveryAddress)) {
-						coords.delivery = addressCacheRef.current.get(deliveryAddress);
-						logger.log(`📍 Usando coordenadas de delivery desde cache para ${orderId}:`, coords.delivery);
-					} else {
-						logger.log(`📍 Geocodificando dirección de delivery para ${orderId}:`, deliveryAddress);
-						const deliveryCoords = await geocodeAddress(deliveryAddress);
-						if (deliveryCoords) {
-							coords.delivery = deliveryCoords;
-							addressCacheRef.current.set(deliveryAddress, deliveryCoords);
-							logger.log(`✅ Coordenadas de delivery obtenidas para ${orderId}:`, deliveryCoords);
+					if (deliveryAddress) {
+						if (addressCacheRef.current.has(deliveryAddress)) {
+							coords.delivery = addressCacheRef.current.get(deliveryAddress);
 						} else {
-							logger.warn(`⚠️ No se pudieron obtener coordenadas de delivery para ${orderId}:`, deliveryAddress);
+							try {
+								const deliveryCoords = await geocodeAddress(deliveryAddress);
+								if (deliveryCoords) {
+									coords.delivery = deliveryCoords;
+									addressCacheRef.current.set(deliveryAddress, deliveryCoords);
+								}
+							} catch (err) {
+								logger.error('Error geocodificando delivery:', err);
+							}
 						}
 					}
-				} else {
-					logger.warn(`⚠️ Pedido ${orderId} no tiene dirección de delivery`);
+
+					coordsMap.set(order.id, coords);
+					
+					// Delay para respetar rate limiting de Nominatim (1 req/seg)
+					await new Promise(resolve => setTimeout(resolve, 1000));
 				}
 
-				coordsMap.set(order.id, coords);
+				clearTimeout(timeoutId);
+				orderCoordsRef.current = coordsMap;
 				
-				logger.log(`📍 Coordenadas guardadas para pedido ${order.id}:`, {
-					hasPickup: !!coords.pickup,
-					hasDelivery: !!coords.delivery,
-					pickup: coords.pickup,
-					delivery: coords.delivery
-				});
+				const hasAnyCoords = Array.from(coordsMap.values()).some(coords => coords.pickup || coords.delivery);
+				setHasCoordinates(hasAnyCoords);
 				
-				// Pequeño delay para evitar rate limiting de Google Maps (50ms entre cada geocodificación)
-				await new Promise(resolve => setTimeout(resolve, 50));
+				setLoading(false);
+			} catch (err) {
+				clearTimeout(timeoutId);
+				logger.error('Error en geocoding:', err);
+				setLoading(false);
 			}
-
-			// Guardar coordenadas por pedido
-			orderCoordsRef.current = coordsMap;
-			
-			// Verificar si hay al menos una coordenada disponible
-			const hasAnyCoords = Array.from(coordsMap.values()).some(coords => coords.pickup || coords.delivery);
-			setHasCoordinates(hasAnyCoords);
-			
-			logger.log(`✅ Geocodificación completada. Total de pedidos procesados: ${coordsMap.size}, Cache de direcciones: ${addressCacheRef.current.size}, Tiene coordenadas: ${hasAnyCoords}`);
-			setLoading(false);
 		};
 
 		geocodeOrders();
-	}, [mapLoaded, activeOrders]);
-
-	// Crear o actualizar marcador del repartidor
-	const updateDriverMarker = (driverId, location, order = null) => {
-		if (!mapInstanceRef.current || !window.google) {
-			logger.warn('📍 No se puede crear marcador: mapa no está listo');
-			return;
-		}
-
-		const google = window.google;
-		const position = { lat: location.latitude, lng: location.longitude };
-
-		logger.log('📍 Actualizando marcador del repartidor:', {
-			driverId,
-			position,
-			hasExistingMarker: driverMarkersRef.current.has(driverId)
-		});
-
-		// Si ya existe el marcador, actualizarlo con animación
-		if (driverMarkersRef.current.has(driverId)) {
-			const marker = driverMarkersRef.current.get(driverId);
-			const oldPosition = marker.getPosition();
-			
-			// Animar el movimiento del marcador
-			if (oldPosition && (oldPosition.lat() !== position.lat || oldPosition.lng() !== position.lng)) {
-				// Usar animación de Google Maps para movimiento suave
-				marker.setPosition(position);
-				
-				// Agregar efecto visual de actualización (pulso)
-				const icon = marker.getIcon();
-				if (icon && typeof icon === 'object' && icon.url) {
-					// Crear icono con efecto de pulso
-					const pulseIcon = {
-						...icon,
-						url: icon.url.replace('fill="#ef4444"', 'fill="#ff6b6b"') // Cambiar color temporalmente
-					};
-					marker.setIcon(pulseIcon);
-					
-					// Volver al color original después de 500ms
-					setTimeout(() => {
-						marker.setIcon(icon);
-					}, 500);
-				}
-			} else {
-				marker.setPosition(position);
-			}
-			
-			logger.log('✅ Marcador del repartidor actualizado con animación');
-			return;
-		}
-
-		// Crear nuevo marcador con icono de moto
-		logger.log('📍 Creando nuevo marcador del repartidor');
-		const driverMarker = new google.maps.Marker({
-			position: position,
-			map: mapInstanceRef.current,
-			icon: {
-				url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-					<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
-						<defs>
-							<filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-								<feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
-							</filter>
-						</defs>
-						<g filter="url(#shadow)">
-							<circle cx="20" cy="20" r="18" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
-							<text x="20" y="28" font-size="24" text-anchor="middle">🏍️</text>
-						</g>
-					</svg>
-				`),
-				scaledSize: new google.maps.Size(40, 40),
-				anchor: new google.maps.Point(20, 40)
-			},
-			title: `Repartidor: ${order?.driverName || 'Sin nombre'}`,
-			zIndex: 1000, // Asegurar que esté por encima de otros marcadores
-		});
-
-		const driverInfoWindow = new google.maps.InfoWindow({
-			content: `
-				<div style="padding: 0.5rem;">
-					<h3 style="margin: 0 0 0.25rem 0; font-size: 0.875rem; font-weight: 600;">Repartidor</h3>
-					<p style="margin: 0; font-size: 0.75rem; color: #6b7280;">${order?.driverName || 'Sin nombre'}</p>
-					${order ? `<p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #6b7280;">Pedido: ${order.id}</p>` : ''}
-				</div>
-			`,
-		});
-
-		driverMarker.addListener('click', () => {
-			driverInfoWindow.open(mapInstanceRef.current, driverMarker);
-			if (order && onSelectOrder) {
-				onSelectOrder(order);
-			}
-		});
-
-		driverMarkersRef.current.set(driverId, driverMarker);
-		markersRef.current.push(driverMarker);
-		
-		logger.log('✅ Marcador del repartidor creado exitosamente:', {
-			driverId,
-			position,
-			markerId: driverMarker
-		});
-	};
-
-	// Función para limpiar la ruta del mapa (ocultar el renderer)
-	const clearRoute = useCallback(() => {
-		if (directionsRendererRef.current) {
-			directionsRendererRef.current.setDirections({ routes: [] });
-			logger.log('🗺️ Ruta limpiada');
-		}
-	}, []);
-
-	// Función para mostrar la ruta del pedido seleccionado
-	const showRouteForOrder = useCallback((order, driverLocation, coords) => {
-		// Solo dibujar ruta si este pedido está seleccionado
-		if (selectedOrderId !== order.id) {
-			logger.log(`🗺️ Saltando ruta para pedido ${order.id} - no está seleccionado (selectedOrderId: ${selectedOrderId})`);
-			return;
-		}
-
-		if (!mapInstanceRef.current || !directionsServiceRef.current || !directionsRendererRef.current || !window.google) {
-			logger.warn('No se puede dibujar ruta: mapa, servicio o renderer no disponible', {
-				hasMap: !!mapInstanceRef.current,
-				hasService: !!directionsServiceRef.current,
-				hasRenderer: !!directionsRendererRef.current,
-				hasGoogle: !!window.google
-			});
-			return;
-		}
-
-		if (!coords) {
-			logger.warn(`No hay coordenadas para pedido ${order.id}`);
-			return;
-		}
-
-		const google = window.google;
-		const orderId = order.id;
-
-		// Determinar origen y destino según el estado del pedido
-		let origin = null;
-		let destination = null;
-		let routeColor = '#ef4444'; // Rojo por defecto
-
-		if (order.status === 'Asignado' || order.status === 'En camino al retiro') {
-			// ETAPA 1: Ruta desde repartidor hasta el local (punto de retiro)
-			if (driverLocation && coords.pickup) {
-				origin = {
-					lat: driverLocation.latitude,
-					lng: driverLocation.longitude
-				};
-				destination = {
-					lat: coords.pickup.lat,
-					lng: coords.pickup.lon
-				};
-				routeColor = '#ef4444'; // Rojo para ruta hacia el local
-			} else {
-				logger.warn(`No se puede dibujar ruta hacia local: faltan datos`, {
-					hasDriverLocation: !!driverLocation,
-					hasPickup: !!coords.pickup,
-					orderId
-				});
-				return;
-			}
-		} else if (order.status === 'Producto retirado') {
-			// ETAPA 2: Ruta desde el local hasta el punto de entrega
-			if (coords.pickup && coords.delivery) {
-				origin = {
-					lat: coords.pickup.lat,
-					lng: coords.pickup.lon
-				};
-				destination = {
-					lat: coords.delivery.lat,
-					lng: coords.delivery.lon
-				};
-				routeColor = '#10b981'; // Verde para ruta de entrega
-			} else {
-				logger.warn(`No se puede dibujar ruta de entrega: faltan coordenadas`, {
-					hasPickup: !!coords.pickup,
-					hasDelivery: !!coords.delivery,
-					orderId
-				});
-				return;
-			}
-		} else {
-			logger.log(`No se dibuja ruta para pedido ${orderId}: estado ${order.status} no requiere ruta`);
-			return;
-		}
-
-		// Actualizar color de la ruta
-		directionsRendererRef.current.setOptions({
-			polylineOptions: {
-				strokeColor: routeColor,
-				strokeWeight: 6,
-				strokeOpacity: 0.9
-			}
-		});
-
-		// Calcular y mostrar la ruta (esto reemplaza automáticamente la ruta anterior)
-		logger.log(`🗺️ Calculando ruta para pedido ${orderId}`, {
-			status: order.status,
-			from: origin,
-			to: destination,
-			color: routeColor
-		});
-
-		directionsServiceRef.current.route({
-			origin: origin,
-			destination: destination,
-			travelMode: google.maps.TravelMode.DRIVING
-		}, (result, status) => {
-			if (status === 'OK' && directionsRendererRef.current) {
-				// 🔥 CLAVE: setDirections() reemplaza automáticamente la ruta anterior
-				directionsRendererRef.current.setDirections(result);
-				logger.log(`✅ Ruta dibujada para pedido ${orderId}`, {
-					status: order.status,
-					color: routeColor
-				});
-			} else {
-				logger.warn(`❌ Error calculando ruta para pedido ${orderId}:`, status);
-			}
-		});
-	}, [selectedOrderId]);
+	}, [activeOrders]);
 
 	// Cargar ubicación del repartidor
 	const loadDriverLocation = useCallback(async (order) => {
-		// No requerir que el mapa esté listo para cargar la ubicación
-		// La ubicación se necesita para el sidebar incluso sin mapa
-		if (!order.driverId) {
-			logger.warn('📍 No se puede cargar ubicación: pedido sin driverId');
-			return;
-		}
+		if (!order.driverId) return;
 
 		try {
-			logger.log('📍 Cargando ubicación del repartidor:', {
-				driverId: order.driverId,
-				orderId: order.id,
-				orderDbId: order._dbId
-			});
-			
 			const location = await getOrderDriverLocation(order._dbId);
 			if (location && location.latitude && location.longitude) {
 				const locationData = {
@@ -447,31 +164,14 @@ export function TrackingPanel({ orders, onSelectOrder }) {
 					updated_at: location.updated_at,
 				};
 
-				logger.log('📍 Ubicación del repartidor cargada:', {
-					driverId: order.driverId,
-					orderId: order.id,
-					location: locationData
-				});
-
-				// Actualizar estado de ubicación
 				setDriverLocations(prev => {
 					const newMap = new Map(prev);
 					newMap.set(order.driverId, locationData);
 					return newMap;
 				});
 
-				// Crear o actualizar marcador (solo si el mapa está listo)
-				if (mapInstanceRef.current && window.google) {
-					updateDriverMarker(order.driverId, locationData, order);
-				}
-
-				// Suscribirse a actualizaciones de ubicación
+				// Suscribirse a actualizaciones
 				const unsubscribe = subscribeToDriverLocation(order.driverId, (newLocation) => {
-					logger.log('📍 Nueva ubicación recibida via realtime:', {
-						driverId: order.driverId,
-						orderId: order.id,
-						location: newLocation
-					});
 					if (newLocation && newLocation.latitude && newLocation.longitude) {
 						const updatedLocation = {
 							latitude: parseFloat(newLocation.latitude),
@@ -485,22 +185,11 @@ export function TrackingPanel({ orders, onSelectOrder }) {
 							return newMap;
 						});
 
-						// Actualizar marcador solo si el mapa está listo
-						if (mapInstanceRef.current && window.google) {
-							updateDriverMarker(order.driverId, updatedLocation, order);
-							// Actualizar ruta solo si este pedido está seleccionado
-							if (selectedOrderId === order.id) {
-								const coords = orderCoordsRef.current.get(order.id);
-								if (coords) {
-									showRouteForOrder(order, updatedLocation, coords);
-								}
-							}
-							// Centrar mapa en el repartidor si está seleccionado
-							if (selectedDriver === order.driverId) {
-								mapInstanceRef.current.setCenter({
-									lat: updatedLocation.latitude,
-									lng: updatedLocation.longitude
-								});
+						// Recalcular ruta si este pedido está seleccionado
+						if (selectedOrderId === order.id) {
+							const coords = orderCoordsRef.current.get(order.id);
+							if (coords) {
+								calculateRouteForOrder(order, updatedLocation, coords);
 							}
 						}
 					}
@@ -508,7 +197,7 @@ export function TrackingPanel({ orders, onSelectOrder }) {
 
 				subscriptionsRef.current.push(unsubscribe);
 
-				// Fallback: polling cada 5 segundos para este repartidor (más frecuente para mejor tracking)
+				// Polling cada 5 segundos
 				const pollingInterval = setInterval(async () => {
 					try {
 						const currentLocation = await getOrderDriverLocation(order._dbId);
@@ -519,475 +208,147 @@ export function TrackingPanel({ orders, onSelectOrder }) {
 								updated_at: currentLocation.updated_at,
 							};
 							
-							// Verificar si la ubicación cambió significativamente (más de 10 metros)
-							const existingLocation = driverLocations.get(order.driverId);
-							if (existingLocation) {
-								const distance = Math.sqrt(
-									Math.pow(locationData.latitude - existingLocation.latitude, 2) +
-									Math.pow(locationData.longitude - existingLocation.longitude, 2)
-								) * 111000; // Aproximadamente metros
-								
-								// Solo actualizar si se movió más de 10 metros
-								if (distance < 10) {
-									return;
-								}
-							}
-							
 							setDriverLocations(prev => {
 								const newMap = new Map(prev);
 								newMap.set(order.driverId, locationData);
 								return newMap;
 							});
-							// Actualizar marcador solo si el mapa está listo
-							if (mapInstanceRef.current && window.google) {
-								updateDriverMarker(order.driverId, locationData, order);
-								// Actualizar ruta solo si este pedido está seleccionado
-								if (selectedOrderId === order.id) {
-									const coords = orderCoordsRef.current.get(order.id);
-									if (coords) {
-										// Actualizar ruta (setDirections reemplaza automáticamente la anterior)
-										showRouteForOrder(order, locationData, coords);
-									}
-								}
-							}
 						}
 					} catch (err) {
 						logger.error('Error en polling de ubicación:', err);
 					}
-				}, 5000); // Reducido a 5 segundos para tracking más frecuente
+				}, 5000);
 
-				// Guardar intervalo para limpiarlo después
 				subscriptionsRef.current.push(() => clearInterval(pollingInterval));
-			} else {
-				logger.warn('📍 No se encontró ubicación para el repartidor:', {
-					driverId: order.driverId,
-					orderId: order.id
-				});
 			}
 		} catch (err) {
 			logger.error('Error cargando ubicación del repartidor:', err);
 		}
-	}, [onSelectOrder, selectedOrderId]);
+	}, [selectedOrderId]);
 
-	// Cargar ubicaciones de repartidores cuando haya pedidos activos (incluso sin mapa)
+	// Calcular ruta para un pedido
+	const calculateRouteForOrder = useCallback(async (order, driverLocation, coords) => {
+		if (!coords) return;
+
+		let origin = null;
+		let destination = null;
+
+		if (order.status === 'Asignado' || order.status === 'En camino al retiro') {
+			if (driverLocation && coords.pickup) {
+				origin = { lat: driverLocation.latitude, lon: driverLocation.longitude };
+				destination = { lat: coords.pickup.lat, lon: coords.pickup.lon };
+			}
+		} else if (order.status === 'Producto retirado') {
+			if (coords.pickup && coords.delivery) {
+				origin = { lat: coords.pickup.lat, lon: coords.pickup.lon };
+				destination = { lat: coords.delivery.lat, lon: coords.delivery.lon };
+			}
+		}
+
+		if (origin && destination) {
+			const route = await getRoute(origin.lat, origin.lon, destination.lat, destination.lon);
+			if (route && route.geometry) {
+				routeGeometryRef.current = route.geometry;
+			}
+		}
+	}, []);
+
+	// Cargar ubicaciones de repartidores
 	useEffect(() => {
 		if (activeOrders.length === 0) return;
 
-		// Cargar ubicación de cada repartidor asignado
 		activeOrders.forEach((order) => {
 			if (order.driverId && order.status !== 'Pendiente') {
 				const existingLocation = driverLocations.get(order.driverId);
 				if (!existingLocation) {
-					// Solo cargar si no tenemos la ubicación
-					logger.log('📍 Cargando ubicación inicial del repartidor para sidebar:', {
-						driverId: order.driverId,
-						orderId: order.id
-					});
 					loadDriverLocation(order);
 				}
 			}
 		});
 	}, [activeOrders, loadDriverLocation, driverLocations]);
 
-	// Inicializar mapa (crear siempre, incluso sin coordenadas)
+	// Calcular ruta cuando cambia el pedido seleccionado
 	useEffect(() => {
-		if (!mapLoaded || !mapRef.current) {
+		if (!selectedOrderId) {
+			routeGeometryRef.current = null;
 			return;
 		}
 
-		const timeoutId = setTimeout(() => {
-			if (!window.google || !window.google.maps) {
-				logger.error('Google Maps no está disponible');
-				return;
-			}
-
-			// Crear mapa si no existe (incluso sin coordenadas)
-			if (!mapInstanceRef.current) {
-				const google = window.google;
-				// Centro por defecto (Santiago, Chile - puedes cambiarlo)
-				const defaultCenter = { lat: -33.4489, lng: -70.6693 };
-				
-				logger.log('🗺️ Creando mapa de Google Maps...');
-				mapInstanceRef.current = new google.maps.Map(mapRef.current, {
-					zoom: 12,
-					center: defaultCenter,
-					mapTypeControl: false,
-					fullscreenControl: true,
-					streetViewControl: false,
-					styles: [
-						{
-							featureType: 'poi',
-							elementType: 'labels',
-							stylers: [{ visibility: 'off' }]
-						}
-					]
-				});
-				
-				// Inicializar Directions Service
-				directionsServiceRef.current = new google.maps.DirectionsService();
-				
-				// Inicializar UN SOLO DirectionsRenderer (se reutiliza para todas las rutas)
-				directionsRendererRef.current = new google.maps.DirectionsRenderer({
-					map: mapInstanceRef.current,
-					suppressMarkers: true, // Ya tenemos nuestros propios marcadores
-					polylineOptions: {
-						strokeColor: '#ef4444', // Color por defecto (rojo)
-						strokeWeight: 6,
-						strokeOpacity: 0.9
-					}
-				});
-				
-				logger.log('✅ Mapa y DirectionsRenderer creados exitosamente');
-			}
-		}, 100);
-
-		return () => clearTimeout(timeoutId);
-	}, [mapLoaded]);
-
-	// Actualizar mapa con coordenadas y marcadores
-	useEffect(() => {
-		if (!mapInstanceRef.current || !window.google || activeOrders.length === 0) {
-			return;
-		}
-
-		// Esperar a que termine la geocodificación
-		if (loading) {
-			return;
-		}
-
-		const timeoutId = setTimeout(() => {
-			const google = window.google;
-			const bounds = new google.maps.LatLngBounds();
-			const allCoords = [];
-
-			// Recopilar todas las coordenadas (pedidos y repartidores)
-			activeOrders.forEach((order) => {
-				const coords = orderCoordsRef.current.get(order.id);
-				if (coords) {
-					if (coords.pickup) {
-						allCoords.push({ lat: coords.pickup.lat, lng: coords.pickup.lon });
-						bounds.extend(new google.maps.LatLng(coords.pickup.lat, coords.pickup.lon));
-					}
-					if (coords.delivery) {
-						allCoords.push({ lat: coords.delivery.lat, lng: coords.delivery.lon });
-						bounds.extend(new google.maps.LatLng(coords.delivery.lat, coords.delivery.lon));
-					}
-				}
-				
-				// Incluir ubicación del repartidor si existe
-				const driverLocation = driverLocations.get(order.driverId);
-				if (driverLocation && driverLocation.latitude && driverLocation.longitude) {
-					allCoords.push({ lat: driverLocation.latitude, lng: driverLocation.longitude });
-					bounds.extend(new google.maps.LatLng(driverLocation.latitude, driverLocation.longitude));
-				}
-			});
-
-			// Ajustar vista del mapa si hay coordenadas
-			if (allCoords.length > 0) {
-				if (allCoords.length > 1) {
-					mapInstanceRef.current.fitBounds(bounds, { padding: 50 });
-				} else {
-					mapInstanceRef.current.setCenter(allCoords[0]);
-					mapInstanceRef.current.setZoom(15);
-				}
-				logger.log(`📍 Ajustando mapa a ${allCoords.length} ubicación(es)`);
-			} else {
-				logger.log('⏳ Esperando coordenadas para ajustar mapa...');
-			}
-
-			// Limpiar solo marcadores de pedidos (pickup/delivery), NO los de repartidores ni las rutas
-			markersRef.current.forEach(marker => marker.setMap(null));
-			markersRef.current = [];
-			// NO limpiar driverMarkersRef ni directionsRendererRef aquí, se mantienen y se actualizan cuando cambia la ubicación
-
-			// Verificar si hay coordenadas disponibles
-			const ordersWithCoords = activeOrders.filter(order => {
-				const coords = orderCoordsRef.current.get(order.id);
-				return coords && (coords.pickup || coords.delivery);
-			});
-
-			if (ordersWithCoords.length === 0 && activeOrders.length > 0) {
-				logger.warn('⚠️ No hay coordenadas disponibles para ningún pedido. La geocodificación puede haber fallado.');
-			}
-
-			// Crear marcadores para cada pedido
-			activeOrders.forEach((order) => {
-				const coords = orderCoordsRef.current.get(order.id);
-				if (!coords) {
-					logger.log(`⏳ Pedido ${order.id}: Esperando coordenadas...`, {
-						hasDeliveryAddress: !!order.deliveryAddress,
-						deliveryAddress: order.deliveryAddress,
-						hasPickupAddress: !!(order.pickupAddress || order.localAddress),
-						allOrderIds: Array.from(orderCoordsRef.current.keys())
-					});
-					return;
-				}
-
-				logger.log(`📍 Creando marcadores para pedido ${order.id}:`, {
-					hasPickup: !!coords.pickup,
-					hasDelivery: !!coords.delivery,
-					pickupCoords: coords.pickup,
-					deliveryCoords: coords.delivery
-				});
-
-				const map = mapInstanceRef.current;
-
-				// Marcador de pickup (local)
-				if (coords.pickup) {
-					// Marcador del local más visible y destacado
-					const pickupMarker = new google.maps.Marker({
-						position: { lat: coords.pickup.lat, lng: coords.pickup.lon },
-						map: map,
-						icon: {
-							url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-								<svg width="48" height="48" xmlns="http://www.w3.org/2000/svg">
-									<defs>
-										<filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-											<feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.4"/>
-										</filter>
-									</defs>
-									<g filter="url(#shadow)">
-										<circle cx="24" cy="24" r="20" fill="#3b82f6" stroke="#ffffff" stroke-width="3"/>
-										<text x="24" y="32" font-size="28" text-anchor="middle" fill="white">🏪</text>
-									</g>
-								</svg>
-							`),
-							scaledSize: new google.maps.Size(48, 48),
-							anchor: new google.maps.Point(24, 48)
-						},
-						title: `Local: ${order.local || 'Sin local'}`,
-						zIndex: 999, // Asegurar que esté visible
-					});
-
-					const pickupInfoWindow = new google.maps.InfoWindow({
-						content: `
-							<div style="padding: 0.5rem;">
-								<h3 style="margin: 0 0 0.25rem 0; font-size: 0.875rem; font-weight: 600;">${order.local || 'Local'}</h3>
-								<p style="margin: 0; font-size: 0.75rem; color: #6b7280;">Pedido: ${order.id}</p>
-								<p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #6b7280;">Cliente: ${order.clientName || 'Sin cliente'}</p>
-							</div>
-						`,
-					});
-
-					pickupMarker.addListener('click', () => {
-						pickupInfoWindow.open(map, pickupMarker);
-						if (onSelectOrder) {
-							onSelectOrder(order);
-						}
-					});
-
-					markersRef.current.push(pickupMarker);
-				}
-
-				// Marcador de delivery (entrega)
-				if (coords.delivery) {
-					const deliveryMarker = new google.maps.Marker({
-						position: { lat: coords.delivery.lat, lng: coords.delivery.lon },
-						map: map,
-						icon: {
-							path: google.maps.SymbolPath.CIRCLE,
-							scale: 8,
-							fillColor: '#10b981',
-							fillOpacity: 1,
-							strokeColor: '#ffffff',
-							strokeWeight: 2,
-						},
-						title: `Entrega: ${order.clientName || 'Sin cliente'}`,
-					});
-
-					const deliveryInfoWindow = new google.maps.InfoWindow({
-						content: `
-							<div style="padding: 0.5rem;">
-								<h3 style="margin: 0 0 0.25rem 0; font-size: 0.875rem; font-weight: 600;">Entrega</h3>
-								<p style="margin: 0; font-size: 0.75rem; color: #6b7280;">Pedido: ${order.id}</p>
-								<p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #6b7280;">Cliente: ${order.clientName || 'Sin cliente'}</p>
-								<p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #6b7280;">Estado: ${order.status}</p>
-							</div>
-						`,
-					});
-
-					deliveryMarker.addListener('click', () => {
-						deliveryInfoWindow.open(map, deliveryMarker);
-						if (onSelectOrder) {
-							onSelectOrder(order);
-						}
-					});
-
-					markersRef.current.push(deliveryMarker);
-				}
-
-				// Cargar ubicación del repartidor si el pedido está asignado
-				if (order.driverId && order.status !== 'Pendiente') {
-					// Verificar si ya tenemos la ubicación en el estado
-					const existingLocation = driverLocations.get(order.driverId);
-					if (existingLocation) {
-						// Si ya tenemos la ubicación, crear el marcador inmediatamente (solo si el mapa está listo)
-						logger.log('📍 Usando ubicación existente del repartidor:', {
-							driverId: order.driverId,
-							location: existingLocation
-						});
-						if (mapInstanceRef.current && window.google) {
-							updateDriverMarker(order.driverId, existingLocation, order);
-							// NO dibujar ruta aquí - se dibujará cuando se seleccione el pedido
-							// Las rutas solo se dibujan cuando selectedOrderId cambia
-						}
-					} else {
-						// Si no tenemos la ubicación, cargarla (siempre, incluso sin mapa)
-						logger.log('📍 Cargando ubicación del repartidor desde Supabase:', {
-							driverId: order.driverId,
-							orderId: order.id
-						});
-						loadDriverLocation(order);
-					}
-				}
-				// NO dibujar rutas aquí - se dibujarán cuando se seleccione el pedido
-				// Las rutas solo se dibujan cuando selectedOrderId cambia
-			});
-		}, 100);
-
-		return () => clearTimeout(timeoutId);
-	}, [loading, activeOrders, onSelectOrder, driverLocations, loadDriverLocation, selectedOrderId]);
-
-	// Mostrar ruta cuando cambia el pedido seleccionado
-	useEffect(() => {
-		if (!mapInstanceRef.current || !window.google || !directionsRendererRef.current) return;
-		
-		// Si hay un pedido seleccionado, mostrar su ruta (setDirections reemplaza automáticamente la anterior)
-		if (selectedOrderId) {
-			const selectedOrder = activeOrders.find(o => o.id === selectedOrderId);
-			if (selectedOrder) {
-				const coords = orderCoordsRef.current.get(selectedOrderId);
-				const driverLocation = selectedOrder.driverId 
-					? driverLocations.get(selectedOrder.driverId) 
-					: null;
-				
-				if (coords && mapInstanceRef.current && window.google) {
-					showRouteForOrder(selectedOrder, driverLocation, coords);
-				} else {
-					// Si no hay coordenadas, limpiar la ruta
-					clearRoute();
-				}
-			}
-		} else {
-			// Si no hay pedido seleccionado, limpiar la ruta
-			clearRoute();
-		}
-	}, [selectedOrderId, activeOrders, driverLocations, showRouteForOrder, clearRoute]);
-
-	// Centrar mapa en repartidor y seleccionar su primer pedido
-	const focusDriver = (driver, orderId = null) => {
-		if (!mapInstanceRef.current || !driver.location) return;
-
-		// Si se pasa un orderId específico, usarlo; si no, usar el primer pedido del repartidor
-		const orderToSelect = orderId 
-			? driver.orders.find(o => o.id === orderId) 
-			: driver.orders[0];
-
-		if (orderToSelect) {
-			// Seleccionar el nuevo pedido (esto disparará el useEffect que muestra la ruta)
-			setSelectedOrderId(orderToSelect.id);
+		const selectedOrder = activeOrders.find(o => o.id === selectedOrderId);
+		if (selectedOrder) {
+			const coords = orderCoordsRef.current.get(selectedOrderId);
+			const driverLocation = selectedOrder.driverId 
+				? driverLocations.get(selectedOrder.driverId) 
+				: null;
 			
-			// Obtener coordenadas del pedido seleccionado
-			const coords = orderCoordsRef.current.get(orderToSelect.id);
-			const driverLocation = driverLocations.get(driver.driverId);
-			
-			// Centrar mapa en el repartidor o en el punto más relevante
-			const position = {
-				lat: driver.location.latitude,
-				lng: driver.location.longitude,
-			};
-			
-			// Si hay coordenadas, ajustar bounds para mostrar todo
 			if (coords) {
-				const bounds = new window.google.maps.LatLngBounds();
-				bounds.extend(position);
-				if (coords.pickup) {
-					bounds.extend(new window.google.maps.LatLng(coords.pickup.lat, coords.pickup.lon));
-				}
-				if (coords.delivery) {
-					bounds.extend(new window.google.maps.LatLng(coords.delivery.lat, coords.delivery.lon));
-				}
-				mapInstanceRef.current.fitBounds(bounds, { padding: 100 });
-			} else {
-				mapInstanceRef.current.setCenter(position);
-				mapInstanceRef.current.setZoom(15);
+				calculateRouteForOrder(selectedOrder, driverLocation, coords);
 			}
-			
-			// Llamar a onSelectOrder si existe
-			if (onSelectOrder) {
-				onSelectOrder(orderToSelect);
-			}
-		} else {
-			// Si no hay pedidos, solo centrar en el repartidor
-			const position = {
-				lat: driver.location.latitude,
-				lng: driver.location.longitude,
-			};
-			mapInstanceRef.current.setCenter(position);
-			mapInstanceRef.current.setZoom(15);
 		}
+	}, [selectedOrderId, activeOrders, driverLocations, calculateRouteForOrder]);
 
-		// Abrir info window del marcador
-		const marker = driverMarkersRef.current.get(driver.driverId);
-		if (marker) {
-			const infoWindow = new window.google.maps.InfoWindow({
-				content: `
-					<div style="padding: 0.5rem;">
-						<h3 style="margin: 0 0 0.25rem 0; font-size: 0.875rem; font-weight: 600;">${driver.driverName}</h3>
-						<p style="margin: 0; font-size: 0.75rem; color: #6b7280;">${driver.orders.length} pedido${driver.orders.length !== 1 ? 's' : ''}</p>
-					</div>
-				`,
-			});
-			infoWindow.open(mapInstanceRef.current, marker);
-		}
-
-		setSelectedDriver(driver.driverId);
-	};
-
-	// Limpiar suscripciones al desmontar
+	// Limpiar suscripciones
 	useEffect(() => {
 		return () => {
 			subscriptionsRef.current.forEach(unsubscribe => {
 				if (unsubscribe) unsubscribe();
 			});
-			markersRef.current.forEach(marker => marker.setMap(null));
-			// Limpiar la ruta
-			if (directionsRendererRef.current) {
-				directionsRendererRef.current.setMap(null);
-			}
 		};
 	}, []);
 
-	// Mostrar error si no hay API key
-	if (!apiKey) {
-		return (
-			<div className="tracking-panel-error">
-				<AlertCircle />
-				<h3>API Key de Google Maps no configurada</h3>
-				<p>Agrega VITE_API_KEY_MAPS en tu archivo .env</p>
-			</div>
-		);
-	}
+	// Centrar en repartidor
+	const focusDriver = (driver, orderId = null) => {
+		const orderToSelect = orderId 
+			? driver.orders.find(o => o.id === orderId) 
+			: driver.orders[0];
 
-	// Mostrar loading solo mientras carga Google Maps API
-	if (!mapLoaded) {
-		return (
-			<div className="tracking-panel-loading">
-				<Navigation />
-				<p>Cargando mapa...</p>
-			</div>
-		);
-	}
+		if (orderToSelect) {
+			setSelectedOrderId(orderToSelect.id);
+			if (onSelectOrder) {
+				onSelectOrder(orderToSelect);
+			}
+		}
+		setSelectedDriver(driver.driverId);
+	};
 
-	// Mostrar error
-	if (error) {
-		return (
-			<div className="tracking-panel-error">
-				<AlertCircle />
-				<h3>{error}</h3>
-			</div>
-		);
-	}
+	// Calcular bounds para el mapa
+	const allBounds = [];
+	activeOrders.forEach((order) => {
+		const coords = orderCoordsRef.current.get(order.id);
+		if (coords) {
+			if (coords.pickup) allBounds.push([coords.pickup.lat, coords.pickup.lon]);
+			if (coords.delivery) allBounds.push([coords.delivery.lat, coords.delivery.lon]);
+		}
+		const driverLocation = driverLocations.get(order.driverId);
+		if (driverLocation) {
+			allBounds.push([driverLocation.latitude, driverLocation.longitude]);
+		}
+	});
+
+	const defaultCenter = [-33.4489, -70.6693];
+	const center = allBounds.length > 0 ? allBounds[0] : defaultCenter;
+
+	// Crear iconos personalizados
+	const createPickupIcon = () => L.divIcon({
+		className: 'custom-marker pickup-marker',
+		html: '<div style="background: #3b82f6; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px;">🏪</div>',
+		iconSize: [24, 24],
+		iconAnchor: [12, 24],
+	});
+
+	const createDeliveryIcon = () => L.divIcon({
+		className: 'custom-marker delivery-marker',
+		html: '<div style="background: #10b981; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+		iconSize: [16, 16],
+		iconAnchor: [8, 8],
+	});
+
+	const createDriverIcon = () => L.divIcon({
+		className: 'custom-marker driver-marker',
+		html: '<div style="background: #ef4444; width: 40px; height: 40px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 20px;">🏍️</div>',
+		iconSize: [40, 40],
+		iconAnchor: [20, 40],
+	});
 
 	// Mostrar mensaje si no hay pedidos activos
 	if (activeOrders.length === 0) {
@@ -996,6 +357,16 @@ export function TrackingPanel({ orders, onSelectOrder }) {
 				<Package />
 				<h3>No hay pedidos activos</h3>
 				<p>Los pedidos activos aparecerán en el mapa</p>
+			</div>
+		);
+	}
+
+	// Mostrar loading solo si realmente está cargando Y no hay coordenadas aún
+	if (loading && !hasCoordinates && orderCoordsRef.current.size === 0) {
+		return (
+			<div className="tracking-panel-loading">
+				<Navigation />
+				<p>Cargando mapa...</p>
 			</div>
 		);
 	}
@@ -1115,10 +486,113 @@ export function TrackingPanel({ orders, onSelectOrder }) {
 					</button>
 				)}
 
-				{/* Mapa */}
-				<div ref={mapRef} className={`tracking-panel-map ${sidebarOpen && driversWithOrders.length > 0 ? 'with-sidebar' : ''}`} />
+				{/* Mapa con Leaflet */}
+				<MapContainer
+					center={center}
+					zoom={allBounds.length > 1 ? 12 : 15}
+					style={{ height: '100%', width: '100%', zIndex: 0 }}
+					scrollWheelZoom={true}
+					className={`tracking-panel-map ${sidebarOpen && driversWithOrders.length > 0 ? 'with-sidebar' : ''}`}
+				>
+					<TileLayer
+						attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+						url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+					/>
+					
+					{/* Ajustar bounds */}
+					{allBounds.length > 1 && <MapBounds bounds={allBounds} />}
+
+					{/* Ruta del pedido seleccionado */}
+					{routeGeometryRef.current && routeGeometryRef.current.coordinates && (() => {
+						const selectedOrder = activeOrders.find(o => o.id === selectedOrderId);
+						const routeColor = selectedOrder?.status === 'Producto retirado' ? '#10b981' : '#ef4444';
+						return (
+							<Polyline
+								positions={routeGeometryRef.current.coordinates.map(coord => [coord[1], coord[0]])}
+								color={routeColor}
+								weight={6}
+								opacity={0.9}
+							/>
+						);
+					})()}
+
+					{/* Marcadores de pedidos */}
+					{activeOrders.map((order) => {
+						const coords = orderCoordsRef.current.get(order.id);
+						if (!coords) return null;
+
+						return (
+							<div key={order.id}>
+								{/* Marcador de pickup */}
+								{coords.pickup && (
+									<Marker 
+										position={[coords.pickup.lat, coords.pickup.lon]} 
+										icon={createPickupIcon()}
+										eventHandlers={{
+											click: () => {
+												setSelectedOrderId(order.id);
+												if (onSelectOrder) onSelectOrder(order);
+											}
+										}}
+									>
+										<Popup>
+											<strong>{order.local || 'Local'}</strong><br/>
+											Pedido: {order.id}<br/>
+											Cliente: {order.clientName || 'Sin cliente'}
+										</Popup>
+									</Marker>
+								)}
+
+								{/* Marcador de delivery */}
+								{coords.delivery && (
+									<Marker 
+										position={[coords.delivery.lat, coords.delivery.lon]} 
+										icon={createDeliveryIcon()}
+										eventHandlers={{
+											click: () => {
+												setSelectedOrderId(order.id);
+												if (onSelectOrder) onSelectOrder(order);
+											}
+										}}
+									>
+										<Popup>
+											<strong>Entrega</strong><br/>
+											Pedido: {order.id}<br/>
+											Cliente: {order.clientName || 'Sin cliente'}<br/>
+											Estado: {order.status}
+										</Popup>
+									</Marker>
+								)}
+
+								{/* Marcador del repartidor */}
+								{order.driverId && order.status !== 'Pendiente' && (() => {
+									const driverLocation = driverLocations.get(order.driverId);
+									if (!driverLocation) return null;
+									
+									return (
+										<Marker 
+											position={[driverLocation.latitude, driverLocation.longitude]} 
+											icon={createDriverIcon()}
+											eventHandlers={{
+												click: () => {
+													setSelectedOrderId(order.id);
+													setSelectedDriver(order.driverId);
+													if (onSelectOrder) onSelectOrder(order);
+												}
+											}}
+										>
+											<Popup>
+												<strong>{order.driverName || 'Repartidor'}</strong><br/>
+												{order.id}
+											</Popup>
+										</Marker>
+									);
+								})()}
+							</div>
+						);
+					})}
+				</MapContainer>
 			</div>
 		</div>
 	);
 }
-

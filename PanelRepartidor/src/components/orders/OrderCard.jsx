@@ -6,11 +6,11 @@ import { getStatusColor, getStatusIcon, formatRelativeTime, formatPrice, geocode
 import { PickupCodeModal } from './PickupCodeModal';
 import { getPrimaryAction, validateOrderForTransition } from '../../constants/orderStatus';
 import toast from 'react-hot-toast';
-import { ensureGoogleMapsLoaded } from '../../utils/googleMapsLoader';
 import { logger } from '../../utils/logger';
+import { OrderMap } from './OrderMap';
 import '../../styles/Components/OrderCard.css';
 
-export function OrderCard({ order, onClick, onDelete, onAcceptOrder, onUpdateStatus, currentTime }) {
+export function OrderCard({ order, onClick, onDelete, onAcceptOrder, onUpdateStatus, currentTime, canAcceptOrder = true }) {
 	const statusColor = getStatusColor(order.status);
 	const StatusIcon = getStatusIcon(order.status);
 	const isPending = order.status === 'Pendiente';
@@ -18,10 +18,6 @@ export function OrderCard({ order, onClick, onDelete, onAcceptOrder, onUpdateSta
 	const isEnCamino = order.status === 'En camino' || order.status === 'En camino al retiro';
 	const [timeRemaining, setTimeRemaining] = useState(null);
 	const [showPickupCodeModal, setShowPickupCodeModal] = useState(false);
-	const [mapLoaded, setMapLoaded] = useState(false);
-	const mapRef = useRef(null);
-	const mapInstanceRef = useRef(null);
-	const directionsRendererRef = useRef(null);
 	const action = getPrimaryAction(order);
 
 	// Calcular tiempo restante si el pedido está "Asignado"
@@ -52,7 +48,8 @@ export function OrderCard({ order, onClick, onDelete, onAcceptOrder, onUpdateSta
 	};
 
 	const openInGoogleMaps = (address) => {
-		const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+		// Usar OpenStreetMap en lugar de Google Maps (gratuito)
+		const url = `https://www.openstreetmap.org/search?query=${encodeURIComponent(address)}`;
 		window.open(url, '_blank');
 	};
 
@@ -60,6 +57,12 @@ export function OrderCard({ order, onClick, onDelete, onAcceptOrder, onUpdateSta
 	const handleAcceptOrder = async (e) => {
 		e.stopPropagation();
 		if (!onAcceptOrder) return;
+
+		// Validar que puede aceptar pedidos
+		if (!canAcceptOrder) {
+			toast.error('No puedes aceptar más pedidos. Tienes 2 o más pedidos activos. Completa algunos antes de aceptar nuevos.');
+			return;
+		}
 
 		try {
 			// Confetti celebration
@@ -159,167 +162,6 @@ export function OrderCard({ order, onClick, onDelete, onAcceptOrder, onUpdateSta
 		return true;
 	};
 
-	// Inicializar mapa con ruta
-	useEffect(() => {
-		if (!order.localAddress || !order.deliveryAddress) return;
-		if (!mapRef.current) return;
-
-		const initMap = async () => {
-			try {
-				const apiKey = import.meta.env.VITE_API_KEY_MAPS;
-				if (!apiKey) {
-					logger.warn('VITE_API_KEY_MAPS no configurada');
-					return;
-				}
-
-				// Cargar Google Maps con librerías necesarias
-				await ensureGoogleMapsLoaded({ 
-					apiKey, 
-					libraries: ['places', 'directions'] 
-				});
-
-				if (!window.google || !window.google.maps) {
-					logger.warn('Google Maps no está disponible');
-					return;
-				}
-
-				// Esperar a que DirectionsService esté disponible
-				let retries = 0;
-				const maxRetries = 20;
-				const retryDelay = 100;
-				while (retries < maxRetries) {
-					if (window.google.maps.DirectionsService) {
-						break;
-					}
-					await new Promise(resolve => setTimeout(resolve, retryDelay));
-					retries++;
-				}
-
-				// Geocodificar ambas direcciones
-				const [localCoords, deliveryCoords] = await Promise.all([
-					geocodeAddress(order.localAddress),
-					geocodeAddress(order.deliveryAddress)
-				]);
-
-				if (!localCoords || !deliveryCoords) {
-					logger.warn('No se pudieron geocodificar las direcciones');
-					return;
-				}
-
-				// Crear mapa centrado entre ambas ubicaciones
-				const center = {
-					lat: (localCoords.lat + deliveryCoords.lat) / 2,
-					lng: (localCoords.lon + deliveryCoords.lon) / 2
-				};
-
-				const map = new window.google.maps.Map(mapRef.current, {
-					zoom: 13,
-					center: center,
-					mapTypeControl: false,
-					fullscreenControl: false,
-					streetViewControl: false,
-					zoomControl: true,
-					styles: [
-						{
-							featureType: 'poi',
-							elementType: 'labels',
-							stylers: [{ visibility: 'off' }]
-						}
-					]
-				});
-
-				mapInstanceRef.current = map;
-
-				// Agregar marcadores usando Marker tradicional
-				// (Aunque está deprecado, sigue funcionando y es más compatible)
-				const localMarker = new window.google.maps.Marker({
-					position: { lat: localCoords.lat, lng: localCoords.lon },
-					map: map,
-					label: {
-						text: 'A',
-						color: 'white',
-						fontSize: '14px',
-						fontWeight: 'bold'
-					},
-					icon: {
-						url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-						scaledSize: new window.google.maps.Size(40, 40)
-					},
-					title: `Local: ${order.localAddress}`
-				});
-
-				const deliveryMarker = new window.google.maps.Marker({
-					position: { lat: deliveryCoords.lat, lng: deliveryCoords.lon },
-					map: map,
-					label: {
-						text: 'B',
-						color: 'white',
-						fontSize: '14px',
-						fontWeight: 'bold'
-					},
-					icon: {
-						url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-						scaledSize: new window.google.maps.Size(40, 40)
-					},
-					title: `Entrega: ${order.deliveryAddress}`
-				});
-
-				// Crear servicio de direcciones
-				const directionsService = new window.google.maps.DirectionsService();
-				const directionsRenderer = new window.google.maps.DirectionsRenderer({
-					map: map,
-					suppressMarkers: true, // Usamos nuestros propios marcadores
-					polylineOptions: {
-						strokeColor: '#FF6B35', // Color naranja similar a la imagen
-						strokeWeight: 5,
-						strokeOpacity: 0.8
-					}
-				});
-
-				directionsRendererRef.current = directionsRenderer;
-
-				// Calcular y mostrar ruta
-				directionsService.route(
-					{
-						origin: { lat: localCoords.lat, lng: localCoords.lon },
-						destination: { lat: deliveryCoords.lat, lng: deliveryCoords.lon },
-						travelMode: window.google.maps.TravelMode.DRIVING
-					},
-					(result, status) => {
-						if (status === 'OK' && result) {
-							directionsRenderer.setDirections(result);
-							// Ajustar zoom para mostrar toda la ruta usando los bounds de la ruta
-							const bounds = result.routes[0].bounds;
-							map.fitBounds(bounds);
-						} else {
-							logger.warn('Error al calcular ruta:', status);
-							// Si falla, solo mostrar los marcadores
-							const bounds = new window.google.maps.LatLngBounds();
-							bounds.extend(new window.google.maps.LatLng(localCoords.lat, localCoords.lon));
-							bounds.extend(new window.google.maps.LatLng(deliveryCoords.lat, deliveryCoords.lon));
-							map.fitBounds(bounds);
-						}
-					}
-				);
-
-				setMapLoaded(true);
-			} catch (error) {
-				logger.error('Error inicializando mapa:', error);
-			}
-		};
-
-		initMap();
-
-		// Cleanup
-		return () => {
-			if (directionsRendererRef.current) {
-				directionsRendererRef.current.setMap(null);
-			}
-			if (mapInstanceRef.current) {
-				mapInstanceRef.current = null;
-			}
-		};
-	}, [order.localAddress, order.deliveryAddress]);
 
 	return (
 		<motion.div
@@ -406,29 +248,24 @@ export function OrderCard({ order, onClick, onDelete, onAcceptOrder, onUpdateSta
 			{/* Mapa embebido con ruta */}
 			{order.localAddress && order.deliveryAddress && (
 				<div className="order-card-map-container">
-					<div 
-						ref={mapRef} 
-						className="order-card-map"
-						style={{ width: '100%', height: '100%', minHeight: '180px' }}
+					<OrderMap 
+						pickupAddress={order.localAddress}
+						deliveryAddress={order.deliveryAddress}
 					/>
-					{!mapLoaded && (
-						<div className="order-card-map-loading">
-							<Navigation className="order-card-map-loading-icon" />
-							<span>Cargando ruta...</span>
-						</div>
-					)}
 				</div>
 			)}
 
 			{/* Botón de acción */}
 			{isPending ? (
 				<motion.button
-					whileHover={{ scale: 1.02 }}
-					whileTap={{ scale: 0.98 }}
+					whileHover={canAcceptOrder ? { scale: 1.02 } : {}}
+					whileTap={canAcceptOrder ? { scale: 0.98 } : {}}
 					onClick={handleAcceptOrder}
-					className="order-card-accept-button"
+					disabled={!canAcceptOrder}
+					className={`order-card-accept-button ${!canAcceptOrder ? 'order-card-accept-button-disabled' : ''}`}
+					title={!canAcceptOrder ? 'No puedes aceptar más pedidos. Tienes 2 o más pedidos activos.' : ''}
 				>
-					Aceptar Pedido
+					{canAcceptOrder ? 'Aceptar Pedido' : 'Límite alcanzado (2+ pedidos activos)'}
 				</motion.button>
 			) : isAssigned ? (
 				<motion.button

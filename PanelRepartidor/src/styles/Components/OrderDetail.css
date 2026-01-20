@@ -287,6 +287,19 @@
 	box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
+.order-detail-driver-button-disabled {
+	background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+	cursor: not-allowed !important;
+	opacity: 0.7;
+	box-shadow: 0 2px 8px rgba(156, 163, 175, 0.2) !important;
+}
+
+.order-detail-driver-button-disabled:hover {
+	background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+	box-shadow: 0 2px 8px rgba(156, 163, 175, 0.2) !important;
+	transform: none !important;
+}
+
 .order-detail-driver-button-orange {
 	background: linear-gradient(to right, #ea580c, #c2410c);
 	color: white;

@@ -127,6 +127,14 @@ export function OrderCard({ order, onClick, onDelete, showDriver = false, curren
 				</div>
 			)}
 
+			{/* Creado por */}
+			{order.creatorName && (
+				<div className="delivery-order-creator">
+					<User size={12} />
+					<span>Creado por: {order.creatorName}</span>
+				</div>
+			)}
+
 			{/* Footer con Tiempo y Precio */}
 			<div className="delivery-order-footer">
 				<div className="delivery-order-time">

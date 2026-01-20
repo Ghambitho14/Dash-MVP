@@ -13,7 +13,8 @@ export function OrdersView({
 	hasLocation,
 	locationLoading,
 	activeTab,
-	onTabChange
+	onTabChange,
+	myOrdersCount = 0
 }) {
 	const [sortBy, setSortBy] = useState('distance');
 	const [showFilters, setShowFilters] = useState(false);
@@ -36,7 +37,8 @@ export function OrdersView({
 	});
 
 	const openInGoogleMaps = (address) => {
-		const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+		// Usar OpenStreetMap en lugar de Google Maps (gratuito)
+		const url = `https://www.openstreetmap.org/search?query=${encodeURIComponent(address)}`;
 		window.open(url, '_blank');
 	};
 
@@ -140,11 +142,23 @@ export function OrdersView({
 								</p>
 							</div>
 						) : sortedOrders.length > 0 ? (
-							<OrderList
-								orders={sortedOrders}
-								onAcceptOrder={onAcceptOrder}
-								onUpdateStatus={onUpdateStatus}
-							/>
+							<>
+								{myOrdersCount >= 2 && (
+									<div className="orders-view-warning orders-view-warning-important">
+										<Package />
+										<div>
+											<p><strong>Límite de pedidos alcanzado</strong></p>
+											<p>Tienes {myOrdersCount} pedido{myOrdersCount !== 1 ? 's' : ''} activo{myOrdersCount !== 1 ? 's' : ''}. Completa algunos antes de aceptar nuevos. Solo puedes ver hasta 2 pedidos disponibles.</p>
+										</div>
+									</div>
+								)}
+								<OrderList
+									orders={sortedOrders}
+									onAcceptOrder={onAcceptOrder}
+									onUpdateStatus={onUpdateStatus}
+									myOrdersCount={myOrdersCount}
+								/>
+							</>
 						) : (
 							<div className="orders-view-empty">
 								<MapPin className="orders-view-empty-icon" />

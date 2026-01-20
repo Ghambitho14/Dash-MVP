@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Home, Package, MapPin, TrendingUp, User as UserIcon } from 'lucide-react';
+import { Home, Package, MapPin, TrendingUp, User as UserIcon, Settings } from 'lucide-react';
 import '../../styles/Components/BottomNavigation.css';
 
 export function BottomNavigation({ activeTab, onTabChange, availableOrdersCount }) {
@@ -9,6 +9,7 @@ export function BottomNavigation({ activeTab, onTabChange, availableOrdersCount 
 		{ id: 'myOrders', icon: MapPin, label: 'Activos' },
 		{ id: 'wallet', icon: TrendingUp, label: 'Ganancias' },
 		{ id: 'profile', icon: UserIcon, label: 'Perfil' },
+		{ id: 'settings', icon: Settings, label: 'Ajustes' },
 	];
 
 	return (

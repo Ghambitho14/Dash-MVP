@@ -61,6 +61,21 @@ export function CompanyPanel({ currentUser, orders, setOrders, onReloadOrders, l
 	const handleDeleteOrderWrapper = handleDeleteOrder;
 	const handleSaveLocalConfigsWrapper = handleSaveLocalConfigs;
 
+	// Función para volver al inicio
+	const handleGoToHome = () => {
+		setSelectedOrder(null);
+		setShowTrackingPanel(false);
+		setShowMetricsPanel(false);
+		setActiveTab('active');
+		setShowCreateForm(false);
+		setShowClientManagement(false);
+		setShowUserManagement(false);
+		setShowLocalSettings(false);
+		setShowSettingsModal(false);
+		setShowAccountSettings(false);
+		setSidebarOpen(false);
+	};
+
 	return (
 		<div className="panel-empresa">
 			{/* Header Superior - Diseño Figma */}
@@ -75,12 +90,25 @@ export function CompanyPanel({ currentUser, orders, setOrders, onReloadOrders, l
 						<Menu />
 					</button>
 					
-					<div className="delivery-logo logo-empresa">
+					<button 
+						className="delivery-logo logo-empresa" 
+						onClick={handleGoToHome}
+						style={{ 
+							background: 'none', 
+							border: 'none', 
+							cursor: 'pointer',
+							padding: 0,
+							display: 'flex',
+							alignItems: 'center',
+							gap: '0.75rem'
+						}}
+						aria-label="Ir al inicio"
+					>
 						<div className="delivery-logo-icon logo-icono-empresa">
 							<Package />
 						</div>
 						<span className="delivery-logo-text">{currentUser.companyName || 'DeliveryApp'}</span>
-					</div>
+					</button>
 					
 					<div className="delivery-header-divider divisor-encabezado-empresa" />
 					

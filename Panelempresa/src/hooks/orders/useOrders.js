@@ -95,10 +95,11 @@ export function useOrders(currentUser) {
 				// Creamos un cliente mínimo (para cumplir client_id NOT NULL en DB) usando la dirección de entrega.
 				const companyId = getCompanyId(currentUser);
 				const clientName = orderData.clientName?.trim() || 'Cliente no registrado';
+				const clientPhone = orderData.clientPhone?.trim() || 'Sin teléfono';
 
 				client = await createClientService({
 					name: clientName,
-					phone: 'Sin teléfono',
+					phone: clientPhone,
 					address: orderData.deliveryAddress,
 				}, companyId, local.id);
 			}

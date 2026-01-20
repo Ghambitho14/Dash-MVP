@@ -1,4 +1,4 @@
-import { X, MapPin, Navigation, DollarSign, FileText, Store, User as UserIcon, Package } from 'lucide-react';
+import { X, MapPin, Navigation, DollarSign, FileText, Store, User as UserIcon, Package, Phone } from 'lucide-react';
 import { useCreateOrderForm } from '../../hooks/orders/useCreateOrderForm';
 import '../../styles/Components/CreateOrderForm.css';
 
@@ -52,9 +52,9 @@ export function CreateOrderForm({ onSubmit, onCancel, currentUser, localConfigs,
 
 				{/* Client Selection */}
 				<div className="formulario-crear-pedido-group">
-					<label htmlFor="order-client" className="formulario-crear-pedido-label">
-						Cliente (Opcional)
-					</label>
+				<label htmlFor="order-client" className="formulario-crear-pedido-label">
+					Cliente
+				</label>
 					<div className="formulario-crear-pedido-input-wrapper">
 						<UserIcon className="formulario-crear-pedido-input-icon" />
 						<div className="formulario-crear-pedido-client-wrapper">
@@ -89,6 +89,27 @@ export function CreateOrderForm({ onSubmit, onCancel, currentUser, localConfigs,
 						</div>
 					</div>
 				</div>
+
+				{/* Client Phone - Solo cuando no hay cliente seleccionado */}
+				{!formData.selectedClientId && (
+					<div className="formulario-crear-pedido-group">
+						<label htmlFor="order-client-phone" className="formulario-crear-pedido-label">
+							Teléfono del Cliente *
+						</label>
+						<div className="formulario-crear-pedido-input-wrapper">
+							<Phone className="formulario-crear-pedido-input-icon" />
+							<input
+								id="order-client-phone"
+								type="tel"
+								value={formData.clientPhone}
+								onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })}
+								placeholder="Ej: +1234567890"
+								className="formulario-crear-pedido-input"
+								required
+							/>
+						</div>
+					</div>
+				)}
 
 				{/* Pickup Address */}
 				<div className="formulario-crear-pedido-group">

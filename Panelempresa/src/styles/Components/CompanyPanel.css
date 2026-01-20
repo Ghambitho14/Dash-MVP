@@ -169,6 +169,12 @@
 	font-weight: 700;
 	font-size: 1.25rem;
 	letter-spacing: -0.02em;
+	transition: opacity var(--app-transition-base);
+}
+
+.delivery-logo:hover,
+.logo-empresa:hover {
+	opacity: 0.8;
 }
 
 .delivery-logo-icon,

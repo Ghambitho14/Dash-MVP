@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, MessageCircle, Clock } from 'lucide-react';
+import { Send, Loader2, MessageCircle, Clock, Image as ImageIcon, X } from 'lucide-react';
 import { useOrderChat } from '../../hooks/useOrderChat';
 import { formatRelativeTime } from '../../utils/utils';
 import '../../styles/Components/OrderChat.css';
@@ -7,7 +7,10 @@ import '../../styles/Components/OrderChat.css';
 export function OrderChat({ order, currentDriver, onClose }) {
 	const [messageInput, setMessageInput] = useState('');
 	const [currentTime, setCurrentTime] = useState(new Date());
+	const [selectedImage, setSelectedImage] = useState(null);
+	const [imagePreview, setImagePreview] = useState(null);
 	const inputRef = useRef(null);
+	const fileInputRef = useRef(null);
 
 	// Actualizar tiempo cada minuto
 	useEffect(() => {
@@ -33,18 +36,79 @@ export function OrderChat({ order, currentDriver, onClose }) {
 		}
 	}, []);
 
+	const handleImageSelect = (e) => {
+		const file = e.target.files[0];
+		if (!file) return;
+
+		// Validar tipo de archivo
+		if (!file.type.startsWith('image/')) {
+			alert('Por favor selecciona una imagen válida');
+			return;
+		}
+
+		// Validar tamaño (máximo 5MB)
+		if (file.size > 5 * 1024 * 1024) {
+			alert('La imagen debe ser menor a 5MB');
+			return;
+		}
+
+		setSelectedImage(file);
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			setImagePreview(reader.result);
+		};
+		reader.readAsDataURL(file);
+	};
+
+	const handleRemoveImage = () => {
+		setSelectedImage(null);
+		setImagePreview(null);
+		if (fileInputRef.current) {
+			fileInputRef.current.value = '';
+		}
+	};
+
 	const handleSend = async (e) => {
 		e.preventDefault();
-		if (!messageInput.trim() || sending) return;
+		if ((!messageInput.trim() && !selectedImage) || sending) return;
 
 		const messageToSend = messageInput.trim();
+		const imageToSend = selectedImage;
 		setMessageInput('');
+		setSelectedImage(null);
+		setImagePreview(null);
+		if (fileInputRef.current) {
+			fileInputRef.current.value = '';
+		}
 
 		try {
-			await sendMessage(messageToSend);
+			await sendMessage(messageToSend, imageToSend);
 		} catch (err) {
-			// El error ya se maneja en el hook
-			setMessageInput(messageToSend); // Restaurar mensaje en caso de error
+			// Restaurar mensaje e imagen en caso de error
+			setMessageInput(messageToSend);
+			if (imageToSend) {
+				setSelectedImage(imageToSend);
+				const reader = new FileReader();
+				reader.onloadend = () => {
+					setImagePreview(reader.result);
+				};
+				reader.readAsDataURL(imageToSend);
+			}
+			
+			// Mostrar error al usuario de forma amigable
+			let errorMessage = 'Error al enviar el mensaje';
+			if (err.message) {
+				if (err.message.includes('bucket') || err.message.includes('Bucket')) {
+					errorMessage = 'Error de configuración: El bucket de almacenamiento no está configurado.\n\n' +
+						'Por favor, contacta al administrador para configurar Supabase Storage.';
+				} else if (err.message.includes('permisos') || err.message.includes('permission')) {
+					errorMessage = 'Error de permisos: No tienes permisos para subir imágenes.\n\n' +
+						'Por favor, contacta al administrador.';
+				} else {
+					errorMessage = err.message;
+				}
+			}
+			alert(errorMessage);
 		}
 	};
 
@@ -129,7 +193,19 @@ export function OrderChat({ order, currentDriver, onClose }) {
 									className={`order-chat-message ${isOwnMessage ? 'order-chat-message-own' : 'order-chat-message-other'}`}
 								>
 									<div className="order-chat-message-content">
-										<p className="order-chat-message-text">{message.message}</p>
+										{message.image_url && (
+											<div className="order-chat-message-image-container">
+												<img
+													src={message.image_url}
+													alt="Imagen del chat"
+													className="order-chat-message-image"
+													onClick={() => window.open(message.image_url, '_blank')}
+												/>
+											</div>
+										)}
+										{message.message && (
+											<p className="order-chat-message-text">{message.message}</p>
+										)}
 										<span className="order-chat-message-time">
 											{formatRelativeTime(message.created_at, currentTime)}
 										</span>
@@ -142,8 +218,41 @@ export function OrderChat({ order, currentDriver, onClose }) {
 				)}
 			</div>
 
+			{/* Image Preview */}
+			{imagePreview && (
+				<div className="order-chat-image-preview">
+					<img src={imagePreview} alt="Vista previa" className="order-chat-image-preview-img" />
+					<button
+						type="button"
+						onClick={handleRemoveImage}
+						className="order-chat-image-preview-remove"
+						aria-label="Eliminar imagen"
+					>
+						<X size={16} />
+					</button>
+				</div>
+			)}
+
 			{/* Input Area */}
 			<form className="order-chat-input-container" onSubmit={handleSend}>
+				<input
+					ref={fileInputRef}
+					type="file"
+					accept="image/*"
+					onChange={handleImageSelect}
+					className="order-chat-file-input"
+					disabled={sending || loading}
+					aria-label="Seleccionar imagen"
+				/>
+				<button
+					type="button"
+					onClick={() => fileInputRef.current?.click()}
+					className="order-chat-image-button"
+					disabled={sending || loading}
+					aria-label="Agregar imagen"
+				>
+					<ImageIcon size={20} />
+				</button>
 				<input
 					ref={inputRef}
 					type="text"
@@ -157,7 +266,7 @@ export function OrderChat({ order, currentDriver, onClose }) {
 				<button
 					type="submit"
 					className="order-chat-send-button"
-					disabled={!messageInput.trim() || sending || loading}
+					disabled={(!messageInput.trim() && !selectedImage) || sending || loading}
 					aria-label="Enviar mensaje"
 				>
 					{sending ? (

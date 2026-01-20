@@ -391,6 +391,25 @@
 	flex-shrink: 0;
 }
 
+/* Creado por */
+.delivery-order-creator {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0;
+	color: var(--app-gray-600);
+	font-size: 0.75rem;
+	font-weight: 500;
+	margin-bottom: 0.5rem;
+}
+
+.delivery-order-creator svg {
+	width: 0.875rem;
+	height: 0.875rem;
+	color: var(--app-gray-500);
+	flex-shrink: 0;
+}
+
 /* Order Footer */
 .delivery-order-footer {
 	display: flex;

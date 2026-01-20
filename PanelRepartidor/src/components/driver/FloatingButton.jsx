@@ -219,6 +219,7 @@ export function FloatingButton({
 												}}
 												onAcceptOrder={onAcceptOrder}
 												onUpdateStatus={onUpdateStatus}
+												canAcceptOrder={myOrdersCount < 2}
 											/>
 										</div>
 									))}

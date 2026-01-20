@@ -1,78 +1,43 @@
 import { useEffect, useState, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { getOrderDriverLocation, subscribeToDriverLocation } from '../../services/locationService';
 import { MapPin, Navigation, Package, Clock } from 'lucide-react';
 import { geocodeAddress, calculateDistance } from '../../utils/utils';
+import { getRoute } from '../../services/routingService';
 import { logger } from '../../utils/logger';
 import '../../styles/Components/OrderMap.css';
+
+// Fix para iconos de Leaflet en producción
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+	iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+	iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+	shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+});
+
+// Componente para ajustar el mapa cuando cambian las coordenadas
+function MapBounds({ bounds }) {
+	const map = useMap();
+	
+	useEffect(() => {
+		if (bounds && bounds.length > 0) {
+			map.fitBounds(bounds, { padding: [50, 50] });
+		}
+	}, [map, bounds]);
+	
+	return null;
+}
 
 export function OrderMap({ order, pickupAddress, deliveryAddress }) {
 	const [driverLocation, setDriverLocation] = useState(null);
 	const [pickupCoords, setPickupCoords] = useState(null);
 	const [deliveryCoords, setDeliveryCoords] = useState(null);
+	const [routeGeometry, setRouteGeometry] = useState(null);
 	const [estimatedTime, setEstimatedTime] = useState(null);
 	const [loading, setLoading] = useState(true);
-	const [mapLoaded, setMapLoaded] = useState(false);
-	const mapRef = useRef(null);
-	const mapInstanceRef = useRef(null);
-	const markersRef = useRef([]);
-	const directionsServiceRef = useRef(null);
-	const directionsRendererRef = useRef(null);
 	const unsubscribeRef = useRef(null);
-
-	const apiKey = import.meta.env.VITE_API_KEY_MAPS;
-
-	// Cargar script de Google Maps
-	useEffect(() => {
-		logger.log('🔑 API Key:', apiKey ? 'Configurada' : 'NO CONFIGURADA');
-		
-		if (!apiKey) {
-			logger.error('❌ VITE_API_KEY_MAPS no está configurada en .env');
-			setLoading(false);
-			return;
-		}
-
-		// Verificar si ya está cargado
-		if (window.google && window.google.maps) {
-			logger.log('✅ Google Maps ya está cargado');
-			setMapLoaded(true);
-			return;
-		}
-
-		// Verificar si el script ya existe
-		const existingScript = document.querySelector(`script[src*="maps.googleapis.com"]`);
-		if (existingScript) {
-			logger.log('📜 Script de Google Maps ya existe, esperando carga...');
-			existingScript.addEventListener('load', () => {
-				logger.log('✅ Script cargado desde elemento existente');
-				setMapLoaded(true);
-			});
-			// Si ya está cargado pero no detectamos window.google, esperar un poco
-			if (window.google && window.google.maps) {
-				setMapLoaded(true);
-			}
-			return;
-		}
-
-		logger.log('📥 Cargando script de Google Maps...');
-		// Cargar script de Google Maps con loading=async
-		const script = document.createElement('script');
-		script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,directions&loading=async`;
-		script.async = true;
-		script.defer = true;
-		script.onload = () => {
-			logger.log('✅ Google Maps API cargada correctamente');
-			setMapLoaded(true);
-		};
-		script.onerror = (error) => {
-			logger.error('❌ Error cargando Google Maps API:', error);
-			setLoading(false);
-		};
-		document.head.appendChild(script);
-
-		return () => {
-			// No limpiar el script, puede ser usado por otros componentes
-		};
-	}, [apiKey]);
 
 	// Geocodificar direcciones
 	useEffect(() => {
@@ -100,7 +65,27 @@ export function OrderMap({ order, pickupAddress, deliveryAddress }) {
 		loadAddresses();
 	}, [pickupAddress, deliveryAddress]);
 
-	// Calcular tiempo estimado
+	// Calcular ruta entre pickup y delivery
+	useEffect(() => {
+		const calculateRoute = async () => {
+			if (pickupCoords && deliveryCoords) {
+				const route = await getRoute(
+					pickupCoords.lat,
+					pickupCoords.lon,
+					deliveryCoords.lat,
+					deliveryCoords.lon
+				);
+				if (route) {
+					setRouteGeometry(route.geometry);
+					setEstimatedTime(Math.ceil(route.duration));
+				}
+			}
+		};
+
+		calculateRoute();
+	}, [pickupCoords, deliveryCoords]);
+
+	// Calcular tiempo estimado desde repartidor
 	useEffect(() => {
 		if (driverLocation && pickupCoords) {
 			const distance = calculateDistance(
@@ -112,8 +97,6 @@ export function OrderMap({ order, pickupAddress, deliveryAddress }) {
 			// Estimación: 1 km = 2 minutos (promedio en ciudad)
 			const minutes = Math.ceil(distance * 2);
 			setEstimatedTime(minutes);
-		} else {
-			setEstimatedTime(null);
 		}
 	}, [driverLocation, pickupCoords]);
 
@@ -163,7 +146,7 @@ export function OrderMap({ order, pickupAddress, deliveryAddress }) {
 			});
 		}
 
-		// Fallback: polling cada 10 segundos para asegurar actualizaciones
+		// Fallback: polling cada 10 segundos
 		const pollingInterval = setInterval(() => {
 			loadDriverLocation();
 		}, 10000);
@@ -176,287 +159,58 @@ export function OrderMap({ order, pickupAddress, deliveryAddress }) {
 		};
 	}, [order?._dbId, order?.driverId]);
 
-	// Inicializar mapa cuando esté listo
-	useEffect(() => {
-		// Pequeño delay para asegurar que el DOM esté listo (especialmente en modales)
-		const timeoutId = setTimeout(() => {
-			logger.log('🗺️ Inicializando mapa...', {
-				mapLoaded,
-				hasGoogle: !!window.google,
-				hasRef: !!mapRef.current,
-				hasPickup: !!pickupCoords,
-				hasDelivery: !!deliveryCoords
-			});
+	// Calcular bounds para el mapa
+	const bounds = [];
+	if (pickupCoords) bounds.push([pickupCoords.lat, pickupCoords.lon]);
+	if (deliveryCoords) bounds.push([deliveryCoords.lat, deliveryCoords.lon]);
+	if (driverLocation) bounds.push([driverLocation.lat, driverLocation.lng]);
 
-			if (!mapLoaded) {
-				logger.log('⏳ Esperando carga de Google Maps...');
-				return;
-			}
+	// Centro por defecto (Santiago, Chile)
+	const defaultCenter = [-33.4489, -70.6693];
+	const center = bounds.length > 0 
+		? bounds[0] 
+		: defaultCenter;
 
-			if (!window.google || !window.google.maps) {
-				logger.error('❌ window.google no está disponible');
-				return;
-			}
+	// Crear iconos personalizados
+	const pickupIcon = L.divIcon({
+		className: 'custom-marker pickup-marker',
+		html: '<div style="background: #10b981; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+		iconSize: [20, 20],
+		iconAnchor: [10, 10],
+	});
 
-			if (!mapRef.current) {
-				logger.error('❌ mapRef.current no está disponible');
-				return;
-			}
+	const deliveryIcon = L.divIcon({
+		className: 'custom-marker delivery-marker',
+		html: '<div style="background: #f97316; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+		iconSize: [20, 20],
+		iconAnchor: [10, 10],
+	});
 
-			if (!pickupCoords && !deliveryCoords) {
-				logger.log('⏳ Esperando coordenadas...');
-				return;
-			}
-
-			logger.log('✅ Todas las condiciones cumplidas, creando mapa...');
-		const google = window.google;
-		
-		// Calcular centro del mapa
-		const bounds = new google.maps.LatLngBounds();
-		const coords = [];
-		
-		if (pickupCoords) {
-			coords.push({ lat: pickupCoords.lat, lng: pickupCoords.lon });
-			bounds.extend(new google.maps.LatLng(pickupCoords.lat, pickupCoords.lon));
-		}
-		if (deliveryCoords) {
-			coords.push({ lat: deliveryCoords.lat, lng: deliveryCoords.lon });
-			bounds.extend(new google.maps.LatLng(deliveryCoords.lat, deliveryCoords.lon));
-		}
-		if (driverLocation) {
-			coords.push({ lat: driverLocation.lat, lng: driverLocation.lng });
-			bounds.extend(new google.maps.LatLng(driverLocation.lat, driverLocation.lng));
-		}
-
-		// Crear mapa
-		let map = null;
-		try {
-			map = new google.maps.Map(mapRef.current, {
-				zoom: 13,
-				center: coords[0] || { lat: -33.4489, lng: -70.6693 },
-				mapTypeControl: false,
-				fullscreenControl: true,
-				streetViewControl: false,
-				styles: [
-					{
-						featureType: 'poi',
-						elementType: 'labels',
-						stylers: [{ visibility: 'off' }]
-					}
-				]
-			});
-
-			logger.log('✅ Mapa creado exitosamente');
-
-			// Ajustar bounds si hay múltiples puntos
-			if (coords.length > 1) {
-				map.fitBounds(bounds, { padding: 50 });
-			}
-
-			mapInstanceRef.current = map;
-		} catch (error) {
-			logger.error('❌ Error creando mapa:', error);
-			return;
-		}
-
-		// Verificar que el mapa se creó correctamente
-		if (!map || !mapInstanceRef.current) {
-			logger.error('❌ No se pudo crear el mapa');
-			return;
-		}
-
-		// Usar mapInstanceRef para todas las referencias
-		const mapInstance = mapInstanceRef.current;
-
-		// Inicializar Directions Service y Renderer
-		directionsServiceRef.current = new google.maps.DirectionsService();
-		directionsRendererRef.current = new google.maps.DirectionsRenderer({
-			map: mapInstance,
-			suppressMarkers: true, // Usaremos nuestros propios marcadores
-			polylineOptions: {
-				strokeColor: '#10b981',
-				strokeWeight: 5,
-				strokeOpacity: 0.8
-			}
-		});
-
-		// Dibujar ruta si hay ambas direcciones
-		if (pickupCoords && deliveryCoords) {
-			directionsServiceRef.current.route(
-				{
-					origin: { lat: pickupCoords.lat, lng: pickupCoords.lon },
-					destination: { lat: deliveryCoords.lat, lng: deliveryCoords.lon },
-					travelMode: google.maps.TravelMode.DRIVING
-				},
-				(result, status) => {
-					if (status === 'OK' && directionsRendererRef.current) {
-						directionsRendererRef.current.setDirections(result);
-					}
-				}
-			);
-		}
-
-		// Limpiar marcadores anteriores
-		markersRef.current.forEach(marker => marker.setMap(null));
-		markersRef.current = [];
-
-		// Crear marcador de retiro
-		if (pickupCoords) {
-			const pickupMarker = new google.maps.Marker({
-				position: { lat: pickupCoords.lat, lng: pickupCoords.lon },
-				map: mapInstance,
-				icon: {
-					path: google.maps.SymbolPath.CIRCLE,
-					scale: 20,
-					fillColor: '#10b981',
-					fillOpacity: 1,
-					strokeColor: '#ffffff',
-					strokeWeight: 3
-				},
-				title: 'Punto de Retiro',
-				zIndex: 1000
-			});
-
-			const pickupInfoWindow = new google.maps.InfoWindow({
-				content: `
-					<div style="padding: 0.5rem;">
-						<strong>Punto de Retiro</strong><br/>
-						${pickupAddress}
-					</div>
-				`
-			});
-
-			pickupMarker.addListener('click', () => {
-				pickupInfoWindow.open(mapInstance, pickupMarker);
-			});
-
-			markersRef.current.push(pickupMarker);
-		}
-
-		// Crear marcador de entrega
-		if (deliveryCoords) {
-			const deliveryMarker = new google.maps.Marker({
-				position: { lat: deliveryCoords.lat, lng: deliveryCoords.lon },
-				map: mapInstance,
-				icon: {
-					path: google.maps.SymbolPath.CIRCLE,
-					scale: 20,
-					fillColor: '#f97316',
-					fillOpacity: 1,
-					strokeColor: '#ffffff',
-					strokeWeight: 3
-				},
-				title: 'Punto de Entrega',
-				zIndex: 1000
-			});
-
-			const deliveryInfoWindow = new google.maps.InfoWindow({
-				content: `
-					<div style="padding: 0.5rem;">
-						<strong>Punto de Entrega</strong><br/>
-						${deliveryAddress}
-					</div>
-				`
-			});
-
-			deliveryMarker.addListener('click', () => {
-				deliveryInfoWindow.open(mapInstance, deliveryMarker);
-			});
-
-			markersRef.current.push(deliveryMarker);
-		}
-
-		// Crear marcador del repartidor
-		if (driverLocation) {
-			const driverMarker = new google.maps.Marker({
-				position: { lat: driverLocation.lat, lng: driverLocation.lng },
-				map: mapInstance,
-				icon: {
-					url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-						<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg">
-							<defs>
-								<filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-									<feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
-								</filter>
-							</defs>
-							<g filter="url(#shadow)">
-								<rect x="0" y="0" width="60" height="25" rx="4" fill="#3b82f6"/>
-								<text x="30" y="16" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">${estimatedTime || 0} MIN</text>
-								<text x="30" y="45" font-size="30" text-anchor="middle">🏍️</text>
-							</g>
-						</svg>
-					`),
-					scaledSize: new google.maps.Size(60, 60),
-					anchor: new google.maps.Point(30, 60)
-				},
-				title: `Repartidor: ${order.driverName || 'En camino'}`,
-				zIndex: 2000
-			});
-
-			const driverInfoWindow = new google.maps.InfoWindow({
-				content: `
-					<div style="padding: 0.5rem;">
-						<strong>Repartidor</strong><br/>
-						${order.driverName || 'En camino'}<br/>
-						${estimatedTime ? `Llega en ${estimatedTime} minutos` : 'Ubicación en tiempo real'}
-					</div>
-				`
-			});
-
-			driverMarker.addListener('click', () => {
-				driverInfoWindow.open(mapInstance, driverMarker);
-			});
-
-			markersRef.current.push(driverMarker);
-		}
-
-		}, 100); // Pequeño delay para asegurar que el DOM esté listo (especialmente en modales)
-
-		return () => clearTimeout(timeoutId);
-	}, [mapLoaded, pickupCoords, deliveryCoords, driverLocation, estimatedTime, pickupAddress, deliveryAddress, order.driverName]);
-
-	// Limpiar al desmontar
-	useEffect(() => {
-		return () => {
-			// Limpiar marcadores
-			if (markersRef.current) {
-				markersRef.current.forEach(marker => {
-					if (marker && marker.setMap) {
-						marker.setMap(null);
-					}
-				});
-				markersRef.current = [];
-			}
-			// Limpiar directions renderer
-			if (directionsRendererRef.current) {
-				directionsRendererRef.current.setMap(null);
-			}
-		};
-	}, []);
-
-	// Mostrar error si no hay API key
-	if (!apiKey) {
-		return (
-			<div className="order-map-error">
-				<MapPin />
-				<p>API Key de Google Maps no configurada</p>
-				<p style={{ fontSize: '0.75rem', marginTop: '0.5rem', color: '#6b7280' }}>
-					Agrega VITE_API_KEY_MAPS en tu archivo .env en la raíz del proyecto
-				</p>
-			</div>
-		);
-	}
+	const driverIcon = L.divIcon({
+		className: 'custom-marker driver-marker',
+		html: `
+			<div style="
+				background: #3b82f6; 
+				width: 40px; 
+				height: 40px; 
+				border-radius: 50%; 
+				border: 3px solid white; 
+				box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 20px;
+			">🏍️</div>
+		`,
+		iconSize: [40, 40],
+		iconAnchor: [20, 40],
+	});
 
 	// Mostrar loading mientras carga
-	if (loading || !mapLoaded) {
+	if (loading) {
 		return (
 			<div className="order-map-loading">
 				<p>Cargando mapa...</p>
-				{!mapLoaded && (
-					<p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.5rem' }}>
-						Cargando Google Maps API...
-					</p>
-				)}
 			</div>
 		);
 	}
@@ -508,9 +262,62 @@ export function OrderMap({ order, pickupAddress, deliveryAddress }) {
 				)}
 			</div>
 
-			{/* Mapa de Google Maps */}
-			<div ref={mapRef} className="order-map-google" />
+			{/* Mapa con Leaflet */}
+			<MapContainer
+				center={center}
+				zoom={bounds.length > 1 ? 13 : 15}
+				style={{ height: '100%', width: '100%', zIndex: 0 }}
+				scrollWheelZoom={true}
+			>
+				<TileLayer
+					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+					url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+				/>
+				
+				{/* Ajustar bounds cuando hay múltiples puntos */}
+				{bounds.length > 1 && <MapBounds bounds={bounds} />}
+
+				{/* Ruta entre pickup y delivery */}
+				{routeGeometry && routeGeometry.coordinates && (
+					<Polyline
+						positions={routeGeometry.coordinates.map(coord => [coord[1], coord[0]])}
+						color="#10b981"
+						weight={5}
+						opacity={0.8}
+					/>
+				)}
+
+				{/* Marcador de retiro */}
+				{pickupCoords && (
+					<Marker position={[pickupCoords.lat, pickupCoords.lon]} icon={pickupIcon}>
+						<Popup>
+							<strong>Punto de Retiro</strong><br/>
+							{pickupAddress}
+						</Popup>
+					</Marker>
+				)}
+
+				{/* Marcador de entrega */}
+				{deliveryCoords && (
+					<Marker position={[deliveryCoords.lat, deliveryCoords.lon]} icon={deliveryIcon}>
+						<Popup>
+							<strong>Punto de Entrega</strong><br/>
+							{deliveryAddress}
+						</Popup>
+					</Marker>
+				)}
+
+				{/* Marcador del repartidor */}
+				{driverLocation && (
+					<Marker position={[driverLocation.lat, driverLocation.lng]} icon={driverIcon}>
+						<Popup>
+							<strong>Repartidor</strong><br/>
+							{order.driverName || 'En camino'}<br/>
+							{estimatedTime ? `Llega en ${estimatedTime} minutos` : 'Ubicación en tiempo real'}
+						</Popup>
+					</Marker>
+				)}
+			</MapContainer>
 		</div>
 	);
 }
-

@@ -14,7 +14,7 @@ export default function App() {
 	// ✅ TODOS LOS HOOKS DEBEN LLAMARSE SIEMPRE (antes de cualquier early return)
 	const { currentUser, login, logout, updateUser: updateCurrentUser } = useAuth();
 	const { localConfigs, setLocalConfigs, saveLocalConfigs } = useLocals(currentUser);
-	const { clients, createClient, updateClient, deleteClient } = useClients(currentUser, localConfigs);
+	const { clients, createClient, updateClient, deleteClient, reloadClients } = useClients(currentUser, localConfigs);
 	const { users, createUser, updateUser, deleteUser } = useUsers(currentUser, localConfigs);
 	const { orders, setOrders, createOrder, deleteOrder, reloadOrders } = useOrders(currentUser);
 	const { showSuccess, showError } = useToast();
@@ -99,6 +99,8 @@ export default function App() {
 	const handleCreateOrder = async (orderData, clients, localConfigs) => {
 		try {
 			await createOrder(orderData, clients, localConfigs);
+			// Recargar clientes por si se creó uno nuevo durante la creación del pedido
+			await reloadClients();
 			showSuccess('Pedido creado exitosamente');
 		} catch (err) {
 			showError('Error al crear pedido: ' + err.message);

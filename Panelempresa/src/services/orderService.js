@@ -19,6 +19,7 @@ export function formatOrder(order) {
 		pickupCode: order.pickup_code,
 		driverName: order.drivers?.name || null,
 		driverId: order.driver_id,
+		creatorName: order.company_users?.name || null,
 		createdAt: new Date(order.created_at),
 		updatedAt: new Date(order.updated_at),
 		_dbId: order.id,

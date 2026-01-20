@@ -10,6 +10,22 @@
 	min-height: 500px;
 	border-radius: 0.5rem;
 	overflow: hidden;
+	position: relative;
+	z-index: 0;
+}
+
+/* Estilos para Leaflet */
+.tracking-panel-map .leaflet-container {
+	width: 100%;
+	height: 100%;
+	font-family: inherit;
+	z-index: 0;
+}
+
+/* Marcadores personalizados */
+.custom-marker {
+	background: transparent !important;
+	border: none !important;
 }
 
 .tracking-panel-loading,

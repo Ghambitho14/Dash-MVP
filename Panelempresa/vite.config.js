@@ -11,5 +11,14 @@ export default defineConfig({
 	plugins: [react()],
 	// Leer .env desde la raíz del proyecto
 	envDir: path.resolve(__dirname, '..'),
+	// Base path: raíz (explícito para consistencia)
+	base: '/',
+	build: {
+		outDir: 'dist',
+		assetsDir: 'assets',
+	},
+	optimizeDeps: {
+		include: ['leaflet', 'react-leaflet'],
+	},
 });
 

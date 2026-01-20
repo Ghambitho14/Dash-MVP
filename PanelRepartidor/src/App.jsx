@@ -4,6 +4,7 @@ import { Login } from './components/auth/Login';
 import { supabase } from './utils/supabase';
 import { useDriverLocation } from './hooks/useDriverLocation';
 import { useLocationTracking } from './hooks/useLocationTracking';
+import { useOrderNotifications } from './hooks/useOrderNotifications';
 import { geocodeAddress, calculateDistance } from './utils/utils';
 import { getStorageObject, setStorageObject, removeStorageItem, setStorageItem } from './utils/storage';
 import toast from 'react-hot-toast';
@@ -180,6 +181,9 @@ export default function App() {
 		return () => clearTimeout(timeoutId);
 	}, [driverLocation?.lat, driverLocation?.lon, currentDriver, locationLoading]);
 
+	// Hook para notificar cuando aparece un nuevo pedido
+	useOrderNotifications(orders, currentDriver, isOnline);
+
 	// ✅ REALTIME: escuchar cambios en orders SOLO para la company del driver + fallback 60s
 	useEffect(() => {
 		if (!currentDriver) return;
@@ -218,26 +222,37 @@ export default function App() {
 	}, [currentDriver]);
 
 	// Guardar estado "en línea" en storage cuando cambia
+	// Nota: Capacitor Preferences guarda en SharedPreferences, que el Worker puede leer
 	useEffect(() => {
 		if (currentDriver) {
 			setStorageObject('isOnline', isOnline).catch(err => {
 				logger.error('Error guardando estado isOnline:', err);
 			});
+			// Guardar también el driver para que el Worker pueda leerlo
+			setStorageObject('driver', currentDriver).catch(err => {
+				logger.error('Error guardando driver:', err);
+			});
 		}
 	}, [isOnline, currentDriver]);
 
-	// Exponer configuración de Supabase para el servicio de burbuja flotante (Android)
+	// Exponer configuración de Supabase para el Worker en segundo plano (Android)
 	useEffect(() => {
 		const supabaseUrl = import.meta.env.VITE_PROJECT_URL;
 		const supabaseKey = import.meta.env.VITE_ANNON_KEY;
 		
 		if (supabaseUrl && supabaseKey) {
-			setStorageItem('supabase_url', supabaseUrl).catch(err => {
+			setStorageItem('supabase_url', supabaseUrl).then(() => {
+				logger.log('✅ Configuración de Supabase guardada para Worker');
+			}).catch(err => {
 				logger.warn('No se pudo guardar configuración de Supabase:', err);
 			});
-			setStorageItem('supabase_key', supabaseKey).catch(err => {
+			setStorageItem('supabase_key', supabaseKey).then(() => {
+				logger.log('✅ Clave de Supabase guardada para Worker');
+			}).catch(err => {
 				logger.warn('No se pudo guardar configuración de Supabase:', err);
 			});
+		} else {
+			logger.warn('⚠️ Variables de entorno de Supabase no encontradas');
 		}
 	}, []);
 
@@ -355,6 +370,9 @@ export default function App() {
 		// Limpiar credenciales de Supabase al hacer logout (seguridad)
 		await removeStorageItem('supabase_url').catch(() => {});
 		await removeStorageItem('supabase_key').catch(() => {});
+		
+		// Limpiar último pedido notificado para que se vuelva a notificar si hay uno pendiente
+		await removeStorageItem('last_notified_order_id').catch(() => {});
 	};
 
 	// Mostrar loading mientras se verifica la sesión

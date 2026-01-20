@@ -20,6 +20,21 @@
 	overflow: hidden;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	border: 1px solid #e2e8f0;
+	position: relative;
+	z-index: 0;
+}
+
+.simple-map .leaflet-container {
+	width: 100%;
+	height: 100%;
+	font-family: inherit;
+	z-index: 0;
+}
+
+/* Marcadores personalizados */
+.custom-marker {
+	background: transparent !important;
+	border: none !important;
 }
 
 @media (min-width: 768px) {

@@ -12,7 +12,6 @@ import { DriverHeader } from './DriverHeader';
 import { Modal } from '../common/Modal';
 import { ChatButton } from '../orders/ChatButton';
 import { SupportChat } from '../support/SupportChat';
-import { useChatNotifications } from '../../hooks/useChatNotifications';
 import { getOrCreateOrderChat } from '../../services/orderChatService';
 import { supabase } from '../../utils/supabase';
 import { getStorageObject } from '../../utils/storage';
@@ -74,15 +73,17 @@ export function DriverApp({
 	const driverId = driverData?.id;
 	const finalDriverName = driverName || driverData?.name || 'Repartidor';
 
-	// Hook para notificaciones de chat
-	useChatNotifications(orders, currentDriver);
-
 	// ---- Listas derivadas ----
-	const availableOrders = orders.filter(order => order.status === 'Pendiente');
+	const allAvailableOrders = orders.filter(order => order.status === 'Pendiente');
 
 	const myOrders = orders.filter(
 		order => order.driverId === driverId && order.status !== 'Entregado'
 	);
+
+	// Limitar pedidos disponibles a 2 si ya tiene 2 o más pedidos activos
+	const availableOrders = myOrders.length >= 2 
+		? allAvailableOrders.slice(0, 2) 
+		: allAvailableOrders;
 
 	const completedOrders = orders.filter(
 		order => order.driverId === driverId && order.status === 'Entregado'
@@ -90,6 +91,12 @@ export function DriverApp({
 
 	// ---- Aceptar pedido ----
 	const handleAcceptOrder = async (orderId) => {
+		// Validar que no tenga 2 o más pedidos activos
+		if (myOrders.length >= 2) {
+			toast.error('No puedes aceptar más pedidos. Tienes 2 o más pedidos activos. Completa algunos antes de aceptar nuevos.');
+			return;
+		}
+
 		const order = orders.find(order => order.id === orderId);
 		if (!order) {
 			toast.error('Pedido no encontrado');
@@ -454,6 +461,7 @@ export function DriverApp({
 								locationLoading={locationLoading}
 								activeTab={activeTab}
 								onTabChange={setActiveTab}
+								myOrdersCount={myOrders.length}
 							/>
 						) : (
 							<>
@@ -509,7 +517,12 @@ export function DriverApp({
 						</div>
 					)}
 
-					{activeView === 'profile' && <DriverProfile driverName={finalDriverName} />}
+					{activeView === 'profile' && (
+						<DriverProfile 
+							driverName={finalDriverName} 
+							onNavigateToSettings={() => onViewChange('settings')}
+						/>
+					)}
 					{activeView === 'wallet' && <DriverWallet orders={orders} onNavigateToCompleted={() => onViewChange('completed')} />}
 					{activeView === 'settings' && <DriverSettings onLogout={onLogout} />}
 				</motion.div>
@@ -582,6 +595,7 @@ export function DriverApp({
 													}}
 													onAcceptOrder={handleAcceptOrder}
 													onUpdateStatus={handleUpdateStatus}
+													canAcceptOrder={myOrders.length < 2}
 												/>
 											</div>
 										))}

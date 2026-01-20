@@ -197,6 +197,19 @@
 	transform: scale(0.98);
 }
 
+.order-card-accept-button-disabled {
+	background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+	cursor: not-allowed !important;
+	opacity: 0.7;
+	box-shadow: 0 2px 8px rgba(156, 163, 175, 0.2) !important;
+}
+
+.order-card-accept-button-disabled:hover {
+	background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%) !important;
+	box-shadow: 0 2px 8px rgba(156, 163, 175, 0.2) !important;
+	transform: none !important;
+}
+
 /* Botón de retirar producto */
 .order-card-retire-button {
 	width: 100%;

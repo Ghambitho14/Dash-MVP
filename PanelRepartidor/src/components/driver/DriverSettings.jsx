@@ -2,6 +2,7 @@ import { Bell, Shield, Moon, Globe, LogOut } from 'lucide-react';
 import '../../styles/Components/DriverSettings.css';
 
 export function DriverSettings({ onLogout }) {
+
 	return (
 		<div className="driver-settings">
 			<div className="driver-settings-header">
@@ -19,14 +20,9 @@ export function DriverSettings({ onLogout }) {
 							</div>
 							<div className="driver-settings-item-text">
 								<p className="driver-settings-item-label">Notificaciones Push</p>
-								<p className="driver-settings-item-description">Recibe notificaciones de nuevos pedidos</p>
+								<p className="driver-settings-item-description">Recibe notificaciones push cuando llegue un nuevo pedido (solo Android)</p>
 							</div>
 						</div>
-						<label className="driver-settings-toggle">
-							<input type="checkbox" defaultChecked disabled />
-							<span className="driver-settings-toggle-slider"></span>
-						</label>
-						<span className="driver-settings-coming-soon">Próximamente</span>
 					</div>
 				</div>
 

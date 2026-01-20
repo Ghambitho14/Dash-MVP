@@ -1,11 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Headphones, MessageCircle } from 'lucide-react';
+import { Send, Loader2, Headphones, MessageCircle, Image as ImageIcon, X } from 'lucide-react';
 import { useSupportChat } from '../hooks/useSupportChat';
 import '../style/SupportChatAdmin.css';
 
 export function SupportChatAdmin({ chat, admin, onClose }) {
 	const [messageInput, setMessageInput] = useState('');
+	const [selectedImage, setSelectedImage] = useState(null);
+	const [imagePreview, setImagePreview] = useState(null);
 	const inputRef = useRef(null);
+	const fileInputRef = useRef(null);
 
 	const {
 		messages,
@@ -22,18 +25,79 @@ export function SupportChatAdmin({ chat, admin, onClose }) {
 		}
 	}, []);
 
+	const handleImageSelect = (e) => {
+		const file = e.target.files[0];
+		if (!file) return;
+
+		// Validar tipo de archivo
+		if (!file.type.startsWith('image/')) {
+			alert('Por favor selecciona una imagen válida');
+			return;
+		}
+
+		// Validar tamaño (máximo 5MB)
+		if (file.size > 5 * 1024 * 1024) {
+			alert('La imagen debe ser menor a 5MB');
+			return;
+		}
+
+		setSelectedImage(file);
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			setImagePreview(reader.result);
+		};
+		reader.readAsDataURL(file);
+	};
+
+	const handleRemoveImage = () => {
+		setSelectedImage(null);
+		setImagePreview(null);
+		if (fileInputRef.current) {
+			fileInputRef.current.value = '';
+		}
+	};
+
 	const handleSend = async (e) => {
 		e.preventDefault();
-		if (!messageInput.trim() || sending) return;
+		if ((!messageInput.trim() && !selectedImage) || sending) return;
 
 		const messageToSend = messageInput.trim();
+		const imageToSend = selectedImage;
 		setMessageInput('');
+		setSelectedImage(null);
+		setImagePreview(null);
+		if (fileInputRef.current) {
+			fileInputRef.current.value = '';
+		}
 
 		try {
-			await sendMessage(messageToSend);
+			await sendMessage(messageToSend, imageToSend);
 		} catch (err) {
-			// El error ya se maneja en el hook
-			setMessageInput(messageToSend); // Restaurar mensaje en caso de error
+			// Restaurar mensaje e imagen en caso de error
+			setMessageInput(messageToSend);
+			if (imageToSend) {
+				setSelectedImage(imageToSend);
+				const reader = new FileReader();
+				reader.onloadend = () => {
+					setImagePreview(reader.result);
+				};
+				reader.readAsDataURL(imageToSend);
+			}
+			
+			// Mostrar error al usuario de forma amigable
+			let errorMessage = 'Error al enviar el mensaje';
+			if (err.message) {
+				if (err.message.includes('bucket') || err.message.includes('Bucket')) {
+					errorMessage = 'Error de configuración: El bucket de almacenamiento no está configurado.\n\n' +
+						'Por favor, contacta al administrador para configurar Supabase Storage.';
+				} else if (err.message.includes('permisos') || err.message.includes('permission')) {
+					errorMessage = 'Error de permisos: No tienes permisos para subir imágenes.\n\n' +
+						'Por favor, contacta al administrador.';
+				} else {
+					errorMessage = err.message;
+				}
+			}
+			alert(errorMessage);
 		}
 	};
 
@@ -110,7 +174,19 @@ export function SupportChatAdmin({ chat, admin, onClose }) {
 									className={`support-chat-admin-message ${isOwnMessage ? 'support-chat-admin-message-own' : 'support-chat-admin-message-other'}`}
 								>
 									<div className="support-chat-admin-message-content">
-										<p className="support-chat-admin-message-text">{message.message}</p>
+										{message.image_url && (
+											<div className="support-chat-admin-message-image-container">
+												<img
+													src={message.image_url}
+													alt="Imagen del chat"
+													className="support-chat-admin-message-image"
+													onClick={() => window.open(message.image_url, '_blank')}
+												/>
+											</div>
+										)}
+										{message.message && (
+											<p className="support-chat-admin-message-text">{message.message}</p>
+										)}
 										<span className="support-chat-admin-message-time">
 											{formatTime(message.created_at)}
 										</span>
@@ -123,8 +199,41 @@ export function SupportChatAdmin({ chat, admin, onClose }) {
 				)}
 			</div>
 
+			{/* Image Preview */}
+			{imagePreview && (
+				<div className="support-chat-admin-image-preview">
+					<img src={imagePreview} alt="Vista previa" className="support-chat-admin-image-preview-img" />
+					<button
+						type="button"
+						onClick={handleRemoveImage}
+						className="support-chat-admin-image-preview-remove"
+						aria-label="Eliminar imagen"
+					>
+						<X size={16} />
+					</button>
+				</div>
+			)}
+
 			{/* Input Area */}
 			<form className="support-chat-admin-input-container" onSubmit={handleSend}>
+				<input
+					ref={fileInputRef}
+					type="file"
+					accept="image/*"
+					onChange={handleImageSelect}
+					className="support-chat-admin-file-input"
+					disabled={sending || loading}
+					aria-label="Seleccionar imagen"
+				/>
+				<button
+					type="button"
+					onClick={() => fileInputRef.current?.click()}
+					className="support-chat-admin-image-button"
+					disabled={sending || loading}
+					aria-label="Agregar imagen"
+				>
+					<ImageIcon size={20} />
+				</button>
 				<input
 					ref={inputRef}
 					type="text"
@@ -138,7 +247,7 @@ export function SupportChatAdmin({ chat, admin, onClose }) {
 				<button
 					type="submit"
 					className="support-chat-admin-send-button"
-					disabled={!messageInput.trim() || sending || loading}
+					disabled={(!messageInput.trim() && !selectedImage) || sending || loading}
 					aria-label="Enviar mensaje"
 				>
 					{sending ? (

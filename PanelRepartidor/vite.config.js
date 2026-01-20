@@ -25,16 +25,18 @@ export default defineConfig({
 			}
 		}
 	],
-	// Leer .env desde la raíz del proyecto
-	envDir: path.resolve(__dirname, '..'),
-	// Para APK no necesitamos base path, solo para web
-	// base: '/driver/',
+	// Leer .env desde la carpeta del proyecto (PanelRepartidor)
+	envDir: __dirname,
+	// Base path: / para Android (Capacitor sirve desde la raíz)
+	// Para desarrollo web, se puede usar /repartidor/ si se sirve desde un servidor con esa ruta
+	base: '/',
 	build: {
 		outDir: 'dist',
 		assetsDir: 'assets',
 	},
 	// Optimizar dependencias para evitar problemas con imports dinámicos
 	optimizeDeps: {
+		include: ['leaflet', 'react-leaflet'],
 		exclude: ['@capacitor/core', '@capacitor/geolocation', '@capacitor/preferences']
 	}
 });

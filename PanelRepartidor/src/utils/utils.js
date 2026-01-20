@@ -119,83 +119,14 @@ export function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 /**
- * Geocodifica una dirección usando Google Maps JavaScript API Geocoder
+ * Geocodifica una dirección usando Nominatim (OpenStreetMap) - GRATUITO
  * @param {string} address - Dirección a geocodificar
  * @returns {Promise<{lat: number, lon: number} | null>} Coordenadas o null si falla
  */
 export async function geocodeAddress(address) {
-	if (!address || !address.trim()) {
-		return null;
-	}
-
-	const apiKey = import.meta.env.VITE_API_KEY_MAPS;
-	if (!apiKey) {
-		logger.warn('VITE_API_KEY_MAPS no configurada, no se puede geocodificar');
-		return null;
-	}
-
-	// Cargar Google Maps si no está cargado
-	try {
-		const { ensureGoogleMapsLoaded } = await import('./googleMapsLoader');
-		await ensureGoogleMapsLoaded({ apiKey, libraries: ['places'] });
-	} catch (error) {
-		logger.warn('No se pudo cargar Google Maps para geocodificar:', error);
-		return null;
-	}
-
-	// Esperar a que Geocoder esté disponible (evitar race condition)
-	let retries = 0;
-	const maxRetries = 20; // 2 segundos máximo (20 * 100ms)
-	const retryDelay = 100; // ms
-
-	while (retries < maxRetries) {
-		if (window.google && window.google.maps && window.google.maps.Geocoder) {
-			break; // Ya está disponible
-		}
-		await new Promise(resolve => setTimeout(resolve, retryDelay));
-		retries++;
-	}
-
-	// Verificar que Google Maps JavaScript API esté cargada después de esperar
-	if (!window.google || !window.google.maps || !window.google.maps.Geocoder) {
-		logger.warn('Google Maps JavaScript API no está cargada después de esperar, no se puede geocodificar');
-		return null;
-	}
-
-	try {
-		const geocoder = new window.google.maps.Geocoder();
-		
-		return new Promise((resolve) => {
-			geocoder.geocode({ address: address }, (results, status) => {
-				if (status === 'OK' && results && results.length > 0) {
-					const location = results[0].geometry.location;
-					resolve({
-						lat: location.lat(),
-						lon: location.lng()
-					});
-				} else {
-					// Manejar errores específicos
-					if (status === 'REQUEST_DENIED') {
-						logger.error(
-							'❌ Geocoding Service: API no autorizada. ' +
-							'Verifica que la Geocoding API esté habilitada en Google Cloud Console. ' +
-							'https://console.cloud.google.com/apis/library/geocoding-backend.googleapis.com'
-						);
-					} else if (status === 'OVER_QUERY_LIMIT') {
-						logger.warn('⚠️ Límite de consultas de geocodificación excedido');
-					} else if (status === 'ZERO_RESULTS') {
-						logger.warn(`⚠️ No se encontraron resultados para "${address}"`);
-					} else {
-						logger.warn(`⚠️ Geocodificación falló para "${address}": ${status}`);
-					}
-					resolve(null);
-				}
-			});
-		});
-	} catch (error) {
-		logger.warn('Error al geocodificar dirección:', error);
-		return null;
-	}
+	// Importar dinámicamente para evitar dependencias circulares
+	const { geocodeAddress: geocodeWithNominatim } = await import('../services/geocodingService');
+	return geocodeWithNominatim(address);
 }
 
 /**

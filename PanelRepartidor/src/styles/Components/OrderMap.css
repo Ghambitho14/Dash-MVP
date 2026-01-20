@@ -1,0 +1,52 @@
+/* Estilos para el mapa en OrderCard */
+.order-card-map {
+	width: 100%;
+	height: 180px;
+	border-radius: 0.5rem;
+	overflow: hidden;
+	position: relative;
+	z-index: 0;
+}
+
+.order-card-map .leaflet-container {
+	width: 100%;
+	height: 100%;
+	font-family: inherit;
+	z-index: 0;
+}
+
+/* Marcadores personalizados */
+.custom-marker {
+	background: transparent !important;
+	border: none !important;
+}
+
+.order-card-map-loading {
+	width: 100%;
+	height: 180px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	background: #f9fafb;
+	border-radius: 0.5rem;
+	color: #6b7280;
+	font-size: 0.875rem;
+}
+
+.order-card-map-loading-icon {
+	width: 1.5rem;
+	height: 1.5rem;
+	animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+	0%, 100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+

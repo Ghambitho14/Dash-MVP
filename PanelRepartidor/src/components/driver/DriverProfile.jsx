@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { User, Mail, Phone, MapPin } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Settings } from 'lucide-react';
 import { getStorageObject } from '../../utils/storage';
 import '../../styles/Components/DriverProfile.css';
 
-export function DriverProfile({ driverName }) {
+export function DriverProfile({ driverName, onNavigateToSettings }) {
 	const [driver, setDriver] = useState({});
 
 	useEffect(() => {
@@ -65,6 +65,24 @@ export function DriverProfile({ driverName }) {
 						)}
 					</div>
 				</div>
+
+				{/* Botón para ir a Ajustes */}
+				{onNavigateToSettings && (
+					<button
+						onClick={onNavigateToSettings}
+						className="driver-profile-settings-button"
+					>
+						<div className="driver-profile-settings-button-content">
+							<div className="driver-profile-settings-button-icon">
+								<Settings />
+							</div>
+							<div className="driver-profile-settings-button-text">
+								<p className="driver-profile-settings-button-label">Ajustes</p>
+								<p className="driver-profile-settings-button-description">Configura tu aplicación</p>
+							</div>
+						</div>
+					</button>
+				)}
 			</div>
 		</div>
 	);

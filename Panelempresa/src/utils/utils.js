@@ -183,64 +183,13 @@ export function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 /**
- * Geocodifica una dirección usando Google Maps Geocoding API
+ * Geocodifica una dirección usando Nominatim (OpenStreetMap) - GRATUITO
  * @param {string} address - Dirección a geocodificar
  * @returns {Promise<{lat: number, lon: number} | null>} Coordenadas o null si falla
  */
 export async function geocodeAddress(address) {
-	if (!address || !address.trim()) {
-		return null;
-	}
-
-	const apiKey = import.meta.env.VITE_API_KEY_MAPS;
-	if (!apiKey) {
-		logger.warn('VITE_API_KEY_MAPS no configurada, no se puede geocodificar');
-		return null;
-	}
-
-	// Esperar a que Google Maps esté disponible (máximo 3 segundos)
-	if (!window.google || !window.google.maps) {
-		await new Promise((resolve) => {
-			let attempts = 0;
-			const maxAttempts = 30; // 3 segundos (30 * 100ms)
-			const checkGoogle = setInterval(() => {
-				attempts++;
-				if (window.google && window.google.maps && window.google.maps.Geocoder) {
-					clearInterval(checkGoogle);
-					resolve();
-				} else if (attempts >= maxAttempts) {
-					// Timeout después de 3 segundos
-					clearInterval(checkGoogle);
-					resolve();
-				}
-			}, 100);
-		});
-	}
-
-	if (!window.google || !window.google.maps || !window.google.maps.Geocoder) {
-		return null;
-	}
-
-	try {
-		const geocoder = new window.google.maps.Geocoder();
-		
-		return new Promise((resolve) => {
-			geocoder.geocode({ address: address }, (results, status) => {
-				if (status === 'OK' && results && results.length > 0) {
-					const location = results[0].geometry.location;
-					resolve({
-						lat: location.lat(),
-						lon: location.lng()
-					});
-				} else {
-					// Error silencioso para geocodificación (no crítico)
-					resolve(null);
-				}
-			});
-		});
-	} catch (error) {
-		// Error silencioso para geocodificación (no crítico)
-		return null;
-	}
+	// Importar dinámicamente para evitar dependencias circulares
+	const { geocodeAddress: geocodeWithNominatim } = await import('../services/geocodingService');
+	return geocodeWithNominatim(address);
 }
 
